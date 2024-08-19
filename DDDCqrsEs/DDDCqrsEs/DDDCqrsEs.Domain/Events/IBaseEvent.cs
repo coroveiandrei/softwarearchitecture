@@ -7,7 +7,7 @@ using System.Text;
 
 namespace DDDCqrsEs.Domain.Events
 {
-    public interface IBaseEvent : IRequest<Unit>
+    public interface IBaseEvent : IRequest
     {
         public DateTime TimeStamp { get; }
         public string EventType { get; set; }

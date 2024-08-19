@@ -18,7 +18,7 @@ namespace DDDCqrsEs.Application.EventHandlers
             _stockProjectionRepository = stockProjectionRepository;
         }
 
-        public Task<Unit> Handle(StockCreated request, CancellationToken token)
+        public Task Handle(StockCreated request, CancellationToken token)
         {
             StockProjection stock = ModelMapper.MapFromModel(request.AggregateId, request.Stock);
             stock.Version = request.Version;
@@ -26,13 +26,13 @@ namespace DDDCqrsEs.Application.EventHandlers
             return Unit.Task;
         }
 
-        public Task<Unit> Handle(StockUpdated request, CancellationToken token)
+        public Task Handle(StockUpdated request, CancellationToken token)
         {
             _stockProjectionRepository.UpdateStock(request.AggregateId, request.Stock, request.Version);
             return Unit.Task;
         }
 
-        public Task<Unit> Handle(StockDeleted request, CancellationToken token)
+        public Task Handle(StockDeleted request, CancellationToken token)
         {
             _stockProjectionRepository.DeleteStock(request.AggregateId);
             return Unit.Task;

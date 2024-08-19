@@ -150,7 +150,7 @@ namespace DDDCqrsEs.WebUI
                         Options = options
                     });
             });
-            services.AddMediatR(typeof(ToDoQueryHandler).GetTypeInfo().Assembly);
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));
             services.AddValidatorsFromAssembly(typeof(AddToDoCommandValidator).Assembly);
             services.RegisterInfrastructureComponents();
             services.RegisterApplicationServices();
