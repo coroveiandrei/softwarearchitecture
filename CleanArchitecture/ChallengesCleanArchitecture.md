@@ -26,11 +26,13 @@ Server=tcp:[CHANGEMESERVER].database.windows.net,1433;Initial Catalog=arcacsqldb
 
 ### Chalenge #0
 
-Inspect the project dependencies and determine where the API call lands initially and how it is handled at the business logic layer. 
+Inspect the solution and make sense of all the projects and the relationship between them.
+Could you look over the project dependencies and determine where the API call lands initially and how it goes through the onion layers to the business logic and infra layer? 
+Try to draw a diagram if you find it easier.
 
 ### Chalenge #1 
 
-The app's end users just reported a bug: They cannot see the description after they create a todo. 
+The app's end users just reported a bug: They cannot see the description after creating a to-do. 
 Can you see what is going on?
 
 Hint: Scan through the project structure from controller to business logic and see where the field is not mapped
@@ -41,6 +43,9 @@ The end users want to receive an email when they add a new todo, but just in cas
 Hint: To use notifications, you can inspect the events' infrastructure.
 
 ### Challenge #3
+Your manager has decided that SQL is too expensive and would like to migrate the database to Azure Table Storage, which he believes is less expensive. You have been tasked with conducting an initial analysis and estimating the changes required for this migration. What classes or projects would be involved in this migration?
+
+### Challenge #4
 Deploy this architecture on an Azure stack and run it on Azure. What services from the ones created previously would you need?
 
 Hint: Right-click publish from Visual Studio and either select your subscription or use the import publish profile option (profile can be downloaded from Azure)
@@ -49,16 +54,10 @@ In Azure Configuration, create a new setting: ASPNETCORE_ENVIRONMENT: DEVELOPMEN
 
 In AppService Configuration, configure the connection string to your DB
 
-Enable Azure services access to the database from network configuration
+Enable Azure services access to the database from network configuration.
 
-### Challenge #4
+### Challenge #5
 The customer sends you a list of todos in a CSV file in the format name description.
 How could you create a background process that will import the file regularly?
 
-Hint: Which projects do you need to reference in the new Background worker process
-
-### Challenge #5
-The customer wants to be able to support the Project functionality. A project might consist of a series of Todos. However, Todos can exist without projects. A project has a name, a start date, and an end date.
-Could you help him map this new functionality?
-
-
+Hint: Which projects do you need to reference in the new Background worker process? What would be your element of reuse (could you leverage MediatR commands to process both Api and Command requests) ?
