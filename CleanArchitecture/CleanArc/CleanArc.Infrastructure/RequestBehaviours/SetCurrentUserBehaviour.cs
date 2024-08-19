@@ -13,10 +13,10 @@ namespace CleanArc.Infrastructure.RequestBehaviours
 
         public CurrentUserBehavior(ICurrentUserService currentUserService)
         {
-            this._currentUserService = currentUserService;
+            _currentUserService = currentUserService;
         }
 
-        public Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+        public Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
             var castedRequest = (request as BaseRequest<TResponse>);
             castedRequest.User = _currentUserService.GetCurrentUser();

@@ -16,7 +16,6 @@ namespace CleanArc.Infrastructure.Bootstrap
                 .AsImplementedInterfaces()
                 .WithScopedLifetime());
 
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPerformanceBehaviour<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CurrentUserBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
         }
