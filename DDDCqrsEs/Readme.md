@@ -26,7 +26,14 @@ Login with:
 user: admin
 password: P@ssw0rd
 
-The overall sequence diagram:
+### Challenge #0: Project structure & dependencies
+
+Inspect the overall project structure:
+* What are the projects composing the solution? 
+* What are the links between them?
+* Can you spot the resemblance of clean architecture?
+
+Inspect the overall sequence diagram and try to figure out the scope of having 2 entry points projects: WebUI and WebJob
 
 ![image](https://github.com/coroveiandrei/trainingsoftarchforcloud/assets/37452422/f502d235-16cf-48af-8917-fc170f909227)
 
