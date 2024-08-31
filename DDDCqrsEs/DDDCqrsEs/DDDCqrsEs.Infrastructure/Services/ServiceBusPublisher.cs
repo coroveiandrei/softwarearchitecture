@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Newtonsoft.Json;
 using DDDCqrsEs.Domain.Events;
+using DDDCqrsEs.Common;
 
 namespace DDDCqrsEs.Application.Services
 {
+    [MapServiceDependency(Name: nameof(ServiceBusPublisher))]
     public class ServiceBusPublisher : IBaseEventPublisher
     {
         private readonly string _connectionString;

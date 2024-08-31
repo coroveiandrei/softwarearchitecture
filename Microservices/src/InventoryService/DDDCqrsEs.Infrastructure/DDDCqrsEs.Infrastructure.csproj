@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.1" />
+    <PackageReference Include="FluentValidation" Version="11.9.2" />
+    <PackageReference Include="MediatR" Version="12.4.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DDDCqrsEs.Application\DDDCqrsEs.Application.csproj" />
+    <ProjectReference Include="..\DDDCqrsEs.Common\DDDCqrsEs.Common.csproj" />
+    <ProjectReference Include="..\DDDCqrsEs.Domain\DDDCqrsEs.Domain.csproj" />
+    <ProjectReference Include="..\DDDCqrsEs.Persistance\DDDCqrsEs.Persistance.csproj" />
+  </ItemGroup>
+
+</Project>
