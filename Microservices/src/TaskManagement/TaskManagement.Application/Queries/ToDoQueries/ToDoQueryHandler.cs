@@ -20,7 +20,7 @@ namespace TaskManagement.Application.Queries.ActivityQueries
         public async Task<GetAllToDoQueryResponse> Handle(GetAllToDoQuery request, CancellationToken cancellationToken)
         {
             var response = new GetAllToDoQueryResponse();
-            var todos = _repository.GetEntities<ToDo>().Where(x=> x.UserId == request.User.UserId).ToList();
+            var todos = _repository.GetEntities<ToDo>().ToList();
             var toDosResponse = todos.Select(x => new ToDoProjection { Id = x.Id, Name = x.Name, Description = x.Description }).ToList();
             response.ToDoModels = toDosResponse;
             return response;
@@ -29,7 +29,7 @@ namespace TaskManagement.Application.Queries.ActivityQueries
         public async Task<GetToDoByIdQueryResponse> Handle(GetToDoByIdQuery request, CancellationToken cancellationToken)
         {
             var response = new GetToDoByIdQueryResponse();
-            var todo = _repository.GetEntities<ToDo>().Where(x=> x.Id == request.ToDoId && x.UserId == request.User.UserId).FirstOrDefault();
+            var todo = _repository.GetEntities<ToDo>().FirstOrDefault();
             var toDosResponse = new ToDoProjection { Id = todo.Id, Name = todo.Name, Description = todo.Description };
             response.ToDo = toDosResponse;
             return response;

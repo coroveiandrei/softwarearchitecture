@@ -37,7 +37,7 @@ namespace TaskManagement.Application.Commands.ToDoCommands
                 {
                     Id = newId,
                     Name = request.ToDo.Name,
-                    UserId = request.User.UserId,
+                    UserId = Guid.Empty,
                 };
 
                 uow.Add(toDo);

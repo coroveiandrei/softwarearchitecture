@@ -9,7 +9,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Net;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TaskManagement.Infrastructure.Bootstrap;
@@ -23,13 +22,9 @@ using TaskManagement.Application.Bootstrap;
 using Microsoft.Extensions.Options;
 using FluentValidation;
 using TaskManagement.Application.Commands.ToDoCommands;
-using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.AspNetCore.Antiforgery;
 using TaskManagement.Domain.Entities;
 using Quotation.Domain.Entities.Authentication;
-using System.Collections.Generic;
-using TaskManagement.Application.Models.AuthenticationModels;
-using TaskManagement.Application.Interfaces.Authentication;
 
 namespace TaskManagement.WebUI
 {
@@ -58,58 +53,13 @@ namespace TaskManagement.WebUI
                            .AllowAnyMethod();
                 });
             });
-
-            services.AddDistributedMemoryCache();
-
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(options =>
-                {
-                    options.Events.OnRedirectToLogin = context =>
-                    {
-                        context.Response.Headers["Location"] = context.RedirectUri;
-                        context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                        return Task.CompletedTask;
-                    };
-                    options.Events.OnRedirectToAccessDenied = context =>
-                    {
-                        context.Response.Headers["Location"] = context.RedirectUri;
-                        context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-                        return Task.CompletedTask;
-                    };
-                    options.ExpireTimeSpan = TimeSpan.FromHours(1);
-                });
-
+            
             services.AddAntiforgery(options =>
             {
                 options.HeaderName = "X-XSRF-TOKEN";
                 options.SuppressXFrameOptionsHeader = false;
             });
 
-            services.Configure<IdentityOptions>(options =>
-            {
-                // Password settings
-                options.Password.RequireDigit = true;
-                options.Password.RequiredLength = 8;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = true;
-                options.Password.RequireLowercase = false;
-                options.Password.RequiredUniqueChars = 6;
-
-                // Lockout settings
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
-                options.Lockout.MaxFailedAccessAttempts = 10;
-                options.Lockout.AllowedForNewUsers = true;
-
-                // User settings
-                options.User.RequireUniqueEmail = true;
-            });
-
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-                options.ConsentCookie.MaxAge = TimeSpan.FromDays(365);
-            });
 
             var connectionString = Configuration.GetConnectionString("ToDoDatabase");
             services.AddDbContext<ToDoDbContext>(options => options.UseSqlServer(connectionString));
@@ -152,11 +102,6 @@ namespace TaskManagement.WebUI
 
             services.AddControllers(options =>
             {
-                var policy = new AuthorizationPolicyBuilder()
-                      .RequireAuthenticatedUser()
-                      .Build();
-
-                options.Filters.Add(new AuthorizeFilter(policy));
             }).AddDapr();
 
             var daprHttpPort = Environment.GetEnvironmentVariable("DAPR_HTTP_PORT") ?? "7000";
@@ -231,20 +176,7 @@ namespace TaskManagement.WebUI
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");
             });
-            //TODO: See if this really needs to be removed
-            app.UseSpa(spa =>
-            {
-                // To learn more about options for serving an Angular SPA from ASP.NET Core,
-                // see https://go.microsoft.com/fwlink/?linkid=864501
-
-                spa.Options.SourcePath = "ClientApp";
-
-                if (env.IsDevelopment())
-                {
-                    spa.UseAngularCliServer(npmScript: "start");
-                }
-            });
-
+            
             app.Use(async (context, next) =>
             {
                 context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
@@ -314,32 +246,6 @@ namespace TaskManagement.WebUI
                     return Task.CompletedTask;
                 };
             });
-            CreateStartupUsers(serviceProvider);
         }
-
-        private void CreateStartupUsers(IServiceProvider serviceProvider)
-        {
-            var userService = serviceProvider.GetRequiredService<IUserService>();
-
-            if (userService.IsUsernameUnique("admin"))
-            {
-                userService.Register(new RegisterUserModel
-                {
-                    Username = "admin",
-                    Password = "P@ssw0rd",
-                    Email = "admin@webdotnet.com",
-                    Roles = new List<RoleModel> 
-                    {
-                        new RoleModel 
-                        {
-                            Id = Guid.NewGuid().ToString(),
-                            RoleName = RoleTypeEnum.Admin.ToString(),
-                            RoleType = RoleTypeEnum.Admin
-                        }
-                    }
-                });
-            }
-        }
-
     }
 }

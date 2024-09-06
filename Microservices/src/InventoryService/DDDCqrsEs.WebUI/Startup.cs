@@ -1,15 +1,11 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Net;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using DDDCqrsEs.Infrastructure.Bootstrap;
@@ -22,13 +18,8 @@ using DDDCqrsEs.Persistance;
 using DDDCqrsEs.Application.Bootstrap;
 using Microsoft.Extensions.Options;
 using FluentValidation;
-using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.AspNetCore.Antiforgery;
-using DDDCqrsEs.Domain.Entities;
-using Quotation.Domain.Entities.Authentication;
-using System.Collections.Generic;
 using DDDCqrsEs.Infrastructure.Services;
-using DDDCqrsEs.Application.Models.AuthenticationModels;
 using DDDCqrsEs.Application.Commands.StockCommands;
 
 namespace DDDCqrsEs.WebUI
@@ -60,24 +51,6 @@ namespace DDDCqrsEs.WebUI
             });
 
             services.AddDistributedMemoryCache();
-
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(options =>
-                {
-                    options.Events.OnRedirectToLogin = context =>
-                    {
-                        context.Response.Headers["Location"] = context.RedirectUri;
-                        context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                        return Task.CompletedTask;
-                    };
-                    options.Events.OnRedirectToAccessDenied = context =>
-                    {
-                        context.Response.Headers["Location"] = context.RedirectUri;
-                        context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-                        return Task.CompletedTask;
-                    };
-                    options.ExpireTimeSpan = TimeSpan.FromHours(1);
-                });
 
             services.AddAntiforgery(options =>
             {
@@ -150,38 +123,18 @@ namespace DDDCqrsEs.WebUI
             services.RegisterWebAPIServices();
             services.AddCsp(nonceByteAmount: 32);
 
-            services.AddIdentity<User, ApplicationRole>()
-                  .AddEntityFrameworkStores<ToDoDbContext>()
-                  .AddDefaultTokenProviders();
+            var daprHttpPort = Environment.GetEnvironmentVariable("DAPR_HTTP_PORT") ?? "3800";
+            var daprGrpcPort = Environment.GetEnvironmentVariable("DAPR_GRPC_PORT") ?? "80000";
+            services.AddDaprClient(builder => builder
+                .UseHttpEndpoint($"http://localhost:{daprHttpPort}")
+                .UseGrpcEndpoint($"http://localhost:{daprGrpcPort}"));
 
-            services.AddControllers(options =>
-            {
-                var policy = new AuthorizationPolicyBuilder()
-                      .RequireAuthenticatedUser()
-                      .Build();
+            services.AddControllers().AddDapr();
 
-                options.Filters.Add(new AuthorizeFilter(policy));
-            });
-
-            //services.AddOpenApiDocument();
             services.AddApplicationInsightsTelemetry();
 
             services.AddControllersWithViews();
-            // In production, the Angular files will be served from this directory
-            //services.AddSpaStaticFiles(configuration =>
-            //{
-            //    configuration.RootPath = "ClientApp/dist";
-            //});
-
-            //services.AddAppEvents(opt =>
-            //{
-            //    opt.Handlers = new List<AppEventHandlerDescriptor>
-            //    {
-            //        new AppEventHandlerDescriptor(typeof(UserActionLogEventHandler))
-            //    };
-            //});
-
-            // Register the Swagger generator, defining 1 or more Swagger documents
+  
             services.AddSwaggerGen();
         }
 
@@ -246,20 +199,7 @@ namespace DDDCqrsEs.WebUI
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");
             });
-            //TODO: See if this really needs to be removed
-            app.UseSpa(spa =>
-            {
-                // To learn more about options for serving an Angular SPA from ASP.NET Core,
-                // see https://go.microsoft.com/fwlink/?linkid=864501
-
-                spa.Options.SourcePath = "ClientApp";
-
-                if (env.IsDevelopment())
-                {
-                    spa.UseAngularCliServer(npmScript: "start");
-                }
-            });
-
+            
             app.Use(async (context, next) =>
             {
                 context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
@@ -329,32 +269,6 @@ namespace DDDCqrsEs.WebUI
                     return Task.CompletedTask;
                 };
             });
-            CreateStartupUsers(serviceProvider);
         }
-
-        private void CreateStartupUsers(IServiceProvider serviceProvider)
-        {
-            var userService = serviceProvider.GetRequiredService<IUserService>();
-
-            if (userService.IsUsernameUnique("admin"))
-            {
-                userService.Register(new RegisterUserModel
-                {
-                    Username = "admin",
-                    Password = "P@ssw0rd",
-                    Email = "admin@webdotnet.com",
-                    Roles = new List<RoleModel>
-                    {
-                        new RoleModel
-                        {
-                            Id = Guid.NewGuid().ToString(),
-                            RoleName = RoleTypeEnum.Admin.ToString(),
-                            RoleType = RoleTypeEnum.Admin
-                        }
-                    }
-                });
-            }
-        }
-
     }
 }
