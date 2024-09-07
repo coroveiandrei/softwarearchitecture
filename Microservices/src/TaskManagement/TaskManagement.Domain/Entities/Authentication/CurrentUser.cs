@@ -1,7 +1,7 @@
 ﻿using TaskManagement.Domain.Entities;
 using System;
 
-namespace Quotation.Domain.Entities.Authentication
+namespace TaskManagement.Domain.Entities.Authentication
 {
     public class CurrentUser
     {

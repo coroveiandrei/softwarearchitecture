@@ -1,4 +1,4 @@
-﻿using Quotation.Domain.Entities.Authentication;
+﻿using TaskManagement.Domain.Entities.Authentication;
 
 namespace TaskManagement.Application.Interfaces.Authentication
 {

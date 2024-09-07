@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using Newtonsoft.Json;
-using Quotation.Domain.Entities.Authentication;
+using TaskManagement.Domain.Entities.Authentication;
 
 namespace TaskManagement.Application.Common
 {

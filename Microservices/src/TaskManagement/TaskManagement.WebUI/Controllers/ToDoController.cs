@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace TaskManagement.WebUI.Controllers
 {
-    
+
     [ApiController]
     [Route("")]
     public class ToDoController : BaseController
@@ -23,28 +23,28 @@ namespace TaskManagement.WebUI.Controllers
 
         [HttpGet("[action]")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<GetToDoByIdQueryResponse>> GetToDoById([FromQuery]GetToDoByIdQuery query)
+        public async Task<ActionResult<GetToDoByIdQueryResponse>> GetToDoById([FromQuery] GetToDoByIdQuery query)
         {
             return Ok(await Mediator.Send(query));
         }
 
         [HttpPost("[action]")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<AddToDoCommandResponse>> AddToDo([FromBody]AddToDoCommand command)
+        public async Task<ActionResult<AddToDoCommandResponse>> AddToDo([FromBody] AddToDoCommand command)
         {
             return Ok(await Mediator.Send(command));
         }
 
         [HttpPost("[action]")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<EditToDoCommandResponse>> EditToDo([FromBody]EditToDoCommand command)
+        public async Task<ActionResult<EditToDoCommandResponse>> EditToDo([FromBody] EditToDoCommand command)
         {
             return Ok(await Mediator.Send(command));
         }
 
         [HttpPost("[action]")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<Unit>> DeleteToDo([FromBody]DeleteToDoCommand command)
+        public async Task<ActionResult<Unit>> DeleteToDo([FromBody] DeleteToDoCommand command)
         {
             return Ok(await Mediator.Send(command));
         }

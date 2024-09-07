@@ -249,7 +249,7 @@ namespace TaskManagement.Persistance.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Quotation.Domain.Entities.Authentication.ApplicationRole", b =>
+            modelBuilder.Entity("TaskManagement.Domain.Entities.Authentication.ApplicationRole", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityRole");
 

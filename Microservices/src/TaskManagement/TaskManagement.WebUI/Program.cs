@@ -1,61 +1,60 @@
-using System;
-using System.IO;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+// create web-app
+using FluentValidation;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using System;
+using TaskManagement.Application.Commands.ToDoCommands;
+using TaskManagement.WebUI;
+using TaskManagement.Infrastructure.Bootstrap;
+using TaskManagement.Application.Bootstrap;
+using TaskManagement.Persistance.Bootstrap;
+using Google.Api;
+using System.Configuration;
 using TaskManagement.Persistance;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using TaskManagement.Domain.Entities.Authentication;
+using TaskManagement.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 
-namespace TaskManagement.WebUI
+var builder = WebApplication.CreateBuilder(args);
+
+
+var daprHttpPort = Environment.GetEnvironmentVariable("DAPR_HTTP_PORT") ?? "3700";
+var daprGrpcPort = Environment.GetEnvironmentVariable("DAPR_GRPC_PORT") ?? "60000";
+builder.Services.AddDaprClient(builder => builder
+    .UseHttpEndpoint($"http://localhost:{daprHttpPort}")
+    .UseGrpcEndpoint($"http://localhost:{daprGrpcPort}"));
+
+builder.Services.AddControllers();
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));
+builder.Services.AddMediatR(c => c.RegisterServicesFromAssemblyContaining<AddToDoCommandValidator>());
+builder.Services.AddValidatorsFromAssembly(typeof(AddToDoCommandValidator).Assembly);
+builder.Services.RegisterInfrastructureComponents();
+builder.Services.RegisterApplicationServices();
+builder.Services.RegisterRepositories();
+builder.Services.RegisterWebAPIServices();
+builder.Services.AddIdentity<User, ApplicationRole>()
+                  .AddEntityFrameworkStores<ToDoDbContext>()
+                  .AddDefaultTokenProviders();
+
+var connectionString = builder.Configuration.GetConnectionString("ToDoDatabase");
+builder.Services.AddDbContext<ToDoDbContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddLocalization();
+
+var app = builder.Build();
+
+// configure web-app
+if (app.Environment.IsDevelopment())
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            var host = CreateWebHostBuilder(args)
-                .Build();
-
-            using (var scope = host.Services.CreateScope())
-            {
-                var services = scope.ServiceProvider;
-
-                try
-                {
-                    var context = scope.ServiceProvider.GetService<IToDoDbContext>();
-
-                    var concreteContext = (ToDoDbContext)context;
-                    concreteContext.Database.Migrate();
-                }
-                catch (Exception ex)
-                {
-                    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "An error occurred while migrating or initializing the database.");
-                }
-            }
-
-            host.Run();
-        }
-
-        public static IHostBuilder CreateWebHostBuilder(string[] args) =>
-         Host.CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(webBuilder =>
-            {
-                webBuilder.UseStartup<Startup>();
-            }).UseContentRoot(Directory.GetCurrentDirectory())
-             .ConfigureAppConfiguration((hostingContext, config) =>
-             {
-                 var env = hostingContext.HostingEnvironment;
-                 config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                    .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
-                 config.AddEnvironmentVariables();
-             })
-             .ConfigureLogging((hostingContext, logging) =>
-             {
-                 logging.AddConsole();
-                 logging.AddDebug();
-             });
-    }
+    app.UseDeveloperExceptionPage();
 }
+app.UseCloudEvents();
 
+// configure routing
+app.MapControllers();
+app.MapSubscribeHandler();
+
+// let's go!
+app.Run("http://localhost:7000");

@@ -39,15 +39,16 @@ public class PlacementRepository : IPlacemementRepository
             DAPR_STORE_NAME, location, objectId);
     }
 
-    public async Task<string[]> GetEligiblePlacementPositions()
+    public async Task<string[]> GetEligiblePlacementPositions(int take)
     {
         var emptyLocations = new List<string>();
         foreach (var location in AllLocations)
         {
             var result = await _daprClient.GetStateAsync<string>(DAPR_STORE_NAME, location);
-            if (string.IsNullOrEmpty(result))
+            if (string.IsNullOrEmpty(result) && take > 0)
             {
                 emptyLocations.Add(location);
+                take--;
             }
         }
         return emptyLocations.ToArray();

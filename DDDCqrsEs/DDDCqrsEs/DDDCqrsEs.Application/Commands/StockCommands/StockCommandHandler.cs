@@ -1,15 +1,10 @@
 ﻿using MediatR;
-using Newtonsoft.Json;
 using DDDCqrsEs.Application.Common;
 using DDDCqrsEs.Application.Services;
 using DDDCqrsEs.Common;
 using DDDCqrsEs.Domain.Aggregates;
-using DDDCqrsEs.Domain.Entities;
-using DDDCqrsEs.Domain.Events;
-using DDDCqrsEs.Domain.Models;
 using DDDCqrsEs.Domain.Repositories;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -25,12 +20,12 @@ namespace DDDCqrsEs.Application.Commands.StockCommands
     {
 
         private IEventStore _eventRepository;
-        private IBaseEventPublisher _serviceBusPublisher;
+        private IBaseEventPublisher _eventPublisher;
 
         public StockCommandHandler(IEventStore eventRepository, IBaseEventPublisher serviceBusPublisher)
         {
             _eventRepository = eventRepository;
-            _serviceBusPublisher = serviceBusPublisher;
+            _eventPublisher = serviceBusPublisher;
         }
 
         public async Task<CreateStockCommandResponse> Handle(CreateStockCommand request, CancellationToken cancellationToken)

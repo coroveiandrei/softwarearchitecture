@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using TaskManagement.Domain.Entities;
 
-namespace Quotation.Domain.Entities.Authentication
+namespace TaskManagement.Domain.Entities.Authentication
 {
     public class ApplicationRole : IdentityRole
     {

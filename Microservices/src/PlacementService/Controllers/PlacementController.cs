@@ -1,4 +1,5 @@
-﻿using PlacementService.Models;
+﻿using PlacementService.Events;
+using PlacementService.Models;
 using PlacementService.Repositories;
 
 namespace PlacementService.Controllers;
@@ -9,7 +10,6 @@ public class PlacementController : ControllerBase
 {
     private readonly ILogger<PlacementController> _logger;
     private readonly IPlacemementRepository _placementRepository;
-    private readonly string _roadId;
 
     public PlacementController(
         ILogger<PlacementController> logger,
@@ -20,20 +20,20 @@ public class PlacementController : ControllerBase
     }
 
     [HttpGet("GetEligibleLocations")]
-    public async Task<string[]> GetEligibleLocations()
+    public async Task<string[]> GetEligibleLocations([FromQuery] int take)
     {
-        return await _placementRepository.GetEligiblePlacementPositions();
+        _logger.LogInformation($"GetEligibleLocations {take}");
+        return await _placementRepository.GetEligiblePlacementPositions(take);
     }
 
     [HttpPost("ReserveLocation")]
-    public async Task<ActionResult> ReserveLocation([FromBody] PlacementReservationModel placementReservation)
+    public async Task<ActionResult> ReserveLocation([FromBody] PlacementReservationModel placementReservation, [FromServices] DaprClient daprClient)
     {
         try
         {
-            // should also add logic for Location state / Occupied / free / etc
-            // log entry
             _logger.LogInformation($"ReservingLocation {placementReservation.Location} by {placementReservation.ObjectId}");
             await _placementRepository.SavePlacementPosition(placementReservation.Location, placementReservation.ObjectId);
+            await daprClient.PublishEventAsync("pubsub", "placementEvents", new PlacementReservationCreated(placementReservation.ObjectId, placementReservation.Location));
 
             return Ok();
         }
@@ -49,7 +49,6 @@ public class PlacementController : ControllerBase
     {
         try
         {
-            // log entry
             _logger.LogInformation($"ReleasingLocation {placementReleaseModel.Location}");
 
             await _placementRepository.SavePlacementPosition(placementReleaseModel.Location, null);

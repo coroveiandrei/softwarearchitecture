@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using DDDCqrsEs.Common;
 using DDDCqrsEs.Domain.Events;
-using DDDCqrsEs.Persistance.Repositories;
 using MediatR;
 
 namespace DDDCqrsEs.Application.Services

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using TaskManagement.Common;
 using TaskManagement.Domain.Entities;
-using Quotation.Domain.Entities.Authentication;
+using TaskManagement.Domain.Entities.Authentication;
 using System.Threading.Tasks;
 using TaskManagement.Application.Interfaces;
 using System.Threading;

@@ -14,7 +14,6 @@ namespace DDDCqrsEs.Application.Commands.StockCommands
         public CreateStockCommandValidator(IStockProjectionRepository stockProjectionRepository)
         {
             _stockProjectionRepository = stockProjectionRepository;
-            RuleFor(x => x.BestBeforeDate).Must(IsNotInPast).WithMessage("You cannot enter a date from the past.");
             RuleFor(x => x.LicensePlate).Must(BeUnique).WithMessage("License plate already exists in database.");
         }
 

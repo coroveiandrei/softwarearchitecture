@@ -21,6 +21,9 @@ using FluentValidation;
 using Microsoft.AspNetCore.Antiforgery;
 using DDDCqrsEs.Infrastructure.Services;
 using DDDCqrsEs.Application.Commands.StockCommands;
+using DDDCqrsEs.Application.RemoteServices;
+using DDDCqrsEs.Infrastructure.RemoteServices;
+using Dapr.Client;
 
 namespace DDDCqrsEs.WebUI
 {
@@ -115,20 +118,26 @@ namespace DDDCqrsEs.WebUI
                         Options = options
                     });
             });
+
+            var daprHttpPort = Environment.GetEnvironmentVariable("DAPR_HTTP_PORT") ?? "4000";
+            var daprGrpcPort = Environment.GetEnvironmentVariable("DAPR_GRPC_PORT") ?? "40000";
+            services.AddDaprClient(builder => builder
+                .UseHttpEndpoint($"http://localhost:{daprHttpPort}")
+                .UseGrpcEndpoint($"http://localhost:{daprGrpcPort}"));
+
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));
             services.AddValidatorsFromAssembly(typeof(StockCommandHandler).Assembly);
             services.RegisterInfrastructureComponents();
             services.RegisterApplicationServices();
             services.RegisterRepositories();
             services.RegisterWebAPIServices();
+
+            services.AddSingleton<IPlacementService>(_ =>
+                new PlacementService(DaprClient.CreateInvokeHttpClient(
+                "placementservice", $"http://localhost:{daprHttpPort}")));
+
             services.AddCsp(nonceByteAmount: 32);
-
-            var daprHttpPort = Environment.GetEnvironmentVariable("DAPR_HTTP_PORT") ?? "3800";
-            var daprGrpcPort = Environment.GetEnvironmentVariable("DAPR_GRPC_PORT") ?? "80000";
-            services.AddDaprClient(builder => builder
-                .UseHttpEndpoint($"http://localhost:{daprHttpPort}")
-                .UseGrpcEndpoint($"http://localhost:{daprGrpcPort}"));
-
+            
             services.AddControllers().AddDapr();
 
             services.AddApplicationInsightsTelemetry();
@@ -136,6 +145,8 @@ namespace DDDCqrsEs.WebUI
             services.AddControllersWithViews();
   
             services.AddSwaggerGen();
+
+            services.AddLogging();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

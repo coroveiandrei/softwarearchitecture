@@ -3,7 +3,7 @@ using TaskManagement.Application.Interfaces.Authentication;
 using TaskManagement.Application.Models.AuthenticationModels;
 using TaskManagement.Common;
 using TaskManagement.Domain.Entities;
-using Quotation.Domain.Entities.Authentication;
+using TaskManagement.Domain.Entities.Authentication;
 using System;
 using System.Collections.Generic;
 using System.Linq;
