@@ -155,12 +155,7 @@ namespace TaskManagement.WebUI
                 app.UseDeveloperExceptionPage();
             }
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            if (!env.IsDevelopment())
-            {
-                app.UseSpaStaticFiles();
-            }
-
+            
             app.UseRouting();
 
             app.UseCors(MyAllowSpecificOrigins);

@@ -8,17 +8,13 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Net;
-using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using CleanArc.Application.Queries.ActivityQueries;
 using CleanArc.Infrastructure.Bootstrap;
 using CleanArc.Persistance.Bootstrap;
 using Joonasw.AspNetCore.SecurityHeaders;
-using MediatR;
 using System.Linq;
 using System.Globalization;
 using Microsoft.AspNetCore.Identity;
@@ -27,7 +23,6 @@ using CleanArc.Application.Bootstrap;
 using Microsoft.Extensions.Options;
 using FluentValidation;
 using CleanArc.Application.Commands.ToDoCommands;
-using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.AspNetCore.Antiforgery;
 using CleanArc.Domain.Entities;
 using Quotation.Domain.Entities.Authentication;
@@ -167,20 +162,6 @@ namespace CleanArc.WebUI
             services.AddApplicationInsightsTelemetry();
 
             services.AddControllersWithViews();
-            // In production, the Angular files will be served from this directory
-            //services.AddSpaStaticFiles(configuration =>
-            //{
-            //    configuration.RootPath = "ClientApp/dist";
-            //});
-
-            //services.AddAppEvents(opt =>
-            //{
-            //    opt.Handlers = new List<AppEventHandlerDescriptor>
-            //    {
-            //        new AppEventHandlerDescriptor(typeof(UserActionLogEventHandler))
-            //    };
-            //});
-
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen();
         }
@@ -226,10 +207,6 @@ namespace CleanArc.WebUI
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            if (!env.IsDevelopment())
-            {
-                app.UseSpaStaticFiles();
-            }
 
             app.UseRouting();
 
@@ -245,19 +222,6 @@ namespace CleanArc.WebUI
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");
-            });
-            //TODO: See if this really needs to be removed
-            app.UseSpa(spa =>
-            {
-                // To learn more about options for serving an Angular SPA from ASP.NET Core,
-                // see https://go.microsoft.com/fwlink/?linkid=864501
-
-                spa.Options.SourcePath = "ClientApp";
-
-                if (env.IsDevelopment())
-                {
-                    spa.UseAngularCliServer(npmScript: "start");
-                }
             });
 
             app.Use(async (context, next) =>

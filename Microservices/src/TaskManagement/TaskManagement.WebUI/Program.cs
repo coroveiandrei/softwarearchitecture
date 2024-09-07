@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using TaskManagement.Persistance;
-using TaskManagement.WebUI;
 
 namespace TaskManagement.WebUI
 {
@@ -28,8 +27,6 @@ namespace TaskManagement.WebUI
 
                     var concreteContext = (ToDoDbContext)context;
                     concreteContext.Database.Migrate();
-
-                    //ToDoDbContextInitializer.Initialize(concreteContext, bool.Parse(config.GetSection("SeedMockData").Value));
                 }
                 catch (Exception ex)
                 {
