@@ -5,7 +5,7 @@
 2. Make sure you have DAPR, Docker Desktop, and .NET 8 SDK installed
 DAPR Cli - https://docs.dapr.io/getting-started/install-dapr-cli/
 Docker Desktop - https://www.docker.com/products/docker-desktop/
-3. in a cmd run:  _dapr init_
+3. In a cmd run:  _dapr init_
 4. Start the infrastructure containers (localdb, azurite, rabbit). Go to /src/infrastructure and run start-all.ps1. This will spin up 3 docker containers:
 - localdb - used for storage in TaskManagement and InventoryService
 - azureite - used as table storage in InventoryService
@@ -14,28 +14,35 @@ Docker Desktop - https://www.docker.com/products/docker-desktop/
 5. Start TaskManagement Project. 
 
 Navigate to TaskManagement\TaskManagement.WebUI and run start-selfhosted.ps1. If all goes well, you should see:
-== APP == info: Microsoft.Hosting.Lifetime[14]
-== APP ==       Now listening on: http://localhost:7000
-== APP == info: Microsoft.Hosting.Lifetime[0]
-== APP ==       Application started. Press Ctrl+C to shut down.
 
-Notice that it is a copy of the exercise that we did for CleanArchitecture; just that it does not contain authentication.
+```
+== APP == info: Microsoft.Hosting.Lifetime[14]
+== APP == Now listening on: http://localhost:7000
+== APP == info: Microsoft.Hosting.Lifetime[0]
+== APP == Application started. Press Ctrl+C to shut down.
+```
+
+Notice that it is a copy of the exercise we did for CleanArchitecture; it does not contain authentication.
 
 6. Start PlacementService Project. 
-Open another powershell window.
-Navigate to PlacementService and run start-selfhosted.ps1. If all goes well, you should see:
+Open another Powershell window. Navigate to PlacementService and run start-selfhosted.ps1. If all goes well, you should see:
+
+```
 == APP == info: Microsoft.Hosting.Lifetime[14]
 == APP ==       Now listening on: http://localhost:6000
 == APP == info: Microsoft.Hosting.Lifetime[0]
 == APP ==       Application started. Press Ctrl+C to shut down.
+```
 
 7. Start InventoryService Project
-Open another powershell window.
-Navigate to InventoryService\InventoryService.WebUI and run start-selfhosted.ps1. If all goes well, you should see:
+Open another Powershell window. Navigate to InventoryService\InventoryService.WebUI and run start-selfhosted.ps1. If all goes well, you should see:
+
+```
 == APP == info: Microsoft.Hosting.Lifetime[14]
 == APP ==       Now listening on: http://localhost:4000
 == APP == info: Microsoft.Hosting.Lifetime[0]
 == APP ==       Application started. Press Ctrl+C to shut down.
+```
 
 8. Test:
 
