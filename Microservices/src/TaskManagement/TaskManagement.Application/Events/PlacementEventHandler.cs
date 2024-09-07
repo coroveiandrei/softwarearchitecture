@@ -17,7 +17,7 @@ namespace TaskManagement.Application.Events
 
         public async Task Handle(PlacementReservationCreated placementReservationCreated, CancellationToken cancellationToken)
         {
-            _logger.LogInformation($"Placement created for {placementReservationCreated} on {placementReservationCreated.Location}");
+            _logger.LogInformation($"Placement created event received for {placementReservationCreated.ObjectId} on {placementReservationCreated.Location}. Please move your beautiful feet on the docks and move the stock to the appropriate location.");
         }
     }
 }

@@ -6,6 +6,6 @@ Push-Location -Path rabbitmq
 & ./start-rabbitmq.ps1
 Pop-Location
 
-Push-Location -Path tablestorage
-& ./start-tablestorage.ps1
+Push-Location -Path azurite
+& ./start-azurite.ps1
 Pop-Location

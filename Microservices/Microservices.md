@@ -1,23 +1,45 @@
 # Microservices
 
 ### Map & start the solution:
-1. Clone the repo at https://github.com/edwinvw/dapr-traffic-control.
-2. Make sure you have DAPR, Docker Desktop, and .NET 7 SDK installed
+1. Clone the repo. Navigate to Microservices folder.
+2. Make sure you have DAPR, Docker Desktop, and .NET 8 SDK installed
 DAPR Cli - https://docs.dapr.io/getting-started/install-dapr-cli/
 Docker Desktop - https://www.docker.com/products/docker-desktop/
 3. in a cmd run:  _dapr init_
-4. Follow the steps from the readme of the repo starting here: https://github.com/edwinvw/dapr-traffic-control#start-the-infrastructure-components
+4. Start the infrastructure containers (localdb, azurite, rabbit). Go to /src/infrastructure and run start-all.ps1. This will spin up 3 docker containers:
+- localdb - used for storage in TaskManagement and InventoryService
+- azureite - used as table storage in InventoryService
+- rabbit - used as broker for messaging mechanism
 
-If you have issues with the execution policy, just run:
-`` Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass ``
+5. Start TaskManagement Project. 
 
-5. If you succeed in following the steps, you should be able to see emails with fines poping at http://localhost:4000
-6. If you are on Mac and you get this error, it is due to a network security issue on Mac. Please run the steps here to run the application with Consul (https://github.com/edwinvw/dapr-traffic-control#running-self-hosted-on-macos-with-antivirus-software) 
+Navigate to TaskManagement\TaskManagement.WebUI and run start-selfhosted.ps1. If all goes well, you should see:
+== APP == info: Microsoft.Hosting.Lifetime[14]
+== APP ==       Now listening on: http://localhost:7000
+== APP == info: Microsoft.Hosting.Lifetime[0]
+== APP ==       Application started. Press Ctrl+C to shut down.
 
-`` WARN[0275] encountered a retriable error while publishing a subscribed message to topic speedingviolations, err: retriable error returned from app while processing pub/sub event 6967c339-4aef-4b64-8658-0e0c4689598e, topic: speedingviolations, body: System.AggregateException: One or more errors occurred. (Response status code does not indicate success: 500 (Internal Server Error).)
- ---> System.Net.Http.HttpRequestException: Response status code does not indicate success: 500 (Internal Server Error).
-   at System.Net.Http.HttpResponseMessage.EnsureSuccessStatusCode()
-   at System.Net.Http.Json.HttpClientJsonExtensions.GetFromJsonAsyncCore[T](Task`1 taskResponse, JsonSerializerOptions options, CancellationToken cancellationToken) ``
+Notice that it is a copy of the exercise that we did for CleanArchitecture; just that it does not contain authentication.
+
+6. Start PlacementService Project. 
+Open another powershell window.
+Navigate to PlacementService and run start-selfhosted.ps1. If all goes well, you should see:
+== APP == info: Microsoft.Hosting.Lifetime[14]
+== APP ==       Now listening on: http://localhost:6000
+== APP == info: Microsoft.Hosting.Lifetime[0]
+== APP ==       Application started. Press Ctrl+C to shut down.
+
+7. Start InventoryService Project
+Open another powershell window.
+Navigate to InventoryService\InventoryService.WebUI and run start-selfhosted.ps1. If all goes well, you should see:
+== APP == info: Microsoft.Hosting.Lifetime[14]
+== APP ==       Now listening on: http://localhost:4000
+== APP == info: Microsoft.Hosting.Lifetime[0]
+== APP ==       Application started. Press Ctrl+C to shut down.
+
+8. Test:
+
+Open up http://localhost:4000 and create a stock. You should see that a location is received for the stock and also that in TaskManagement console a task has been created.
 
 ### Challenge #1 - Inspect State Store
 
@@ -44,11 +66,3 @@ Inspect the Invoke between FineCollectionService and VehicleRegistrationService
 2. For the subscriber part, inspect CollectionController.CollectFine
 3. For the configuration part, navigate to /dapr/components/pubsub.yaml
  
-
-### Challenge #4 - Inspect Bindings
-
-
-### Challenge #5 - Inspect Monitoring
-
-
-### Challenge #6 - Inspect Actors

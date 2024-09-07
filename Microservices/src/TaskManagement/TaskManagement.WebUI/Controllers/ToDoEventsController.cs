@@ -23,7 +23,6 @@ namespace TaskManagement.WebUI.Controllers
         [Topic("pubsub", "placementEvents", "deadletters", false)]
         public async Task<ActionResult> ReceivePlacementEvent([FromBody] PlacementReservationCreated placementCreatedEvent)
         {
-            _logger.LogInformation("Received placement");
             await Mediator.Send(placementCreatedEvent);
             return Ok();
         }
