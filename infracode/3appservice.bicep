@@ -11,7 +11,7 @@ param resourceTags object = {
 
 module appServicePlanModules 'modules/appServicePlan.bicep' = [for appServicesConfig in appServicePlans: {
   name: '${appServicesConfig.name}-appserviceplan-module'
-  scope: resourceGroup(appServicesConfig.rg)
+  scope: resourceGroup()
   params: {
     location: location
     resourceTags: resourceTags
@@ -29,6 +29,5 @@ module appServiceModule 'modules/appService.bicep' = [ for appServiceConfig in a
     appServiceName: appServiceConfig.name
     resourceTags: resourceTags
     servicePlanName: appServiceConfig.servicePlanName
-    servicePlanResourceGrup: appServiceConfig.servicePlanResourceGrup == '' ? resourceGroup().name : appServiceConfig.servicePlanResourceGrup
   }
 }]

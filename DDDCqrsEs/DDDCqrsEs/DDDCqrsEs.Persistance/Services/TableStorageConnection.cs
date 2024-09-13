@@ -24,6 +24,7 @@ namespace DDDCqrsEs.Infrastructure.Services
             var client = storageAccount.CreateCloudTableClient();
 
             var cloudTable = client.GetTableReference(tableName);
+            await cloudTable.CreateIfNotExistsAsync();
             return cloudTable;
         }
     }

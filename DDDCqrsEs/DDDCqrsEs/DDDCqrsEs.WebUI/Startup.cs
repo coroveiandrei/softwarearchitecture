@@ -8,17 +8,13 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Net;
-using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using DDDCqrsEs.Application.Queries.ActivityQueries;
 using DDDCqrsEs.Infrastructure.Bootstrap;
 using DDDCqrsEs.Persistance.Bootstrap;
 using Joonasw.AspNetCore.SecurityHeaders;
-using MediatR;
 using System.Linq;
 using System.Globalization;
 using Microsoft.AspNetCore.Identity;
@@ -26,8 +22,6 @@ using DDDCqrsEs.Persistance;
 using DDDCqrsEs.Application.Bootstrap;
 using Microsoft.Extensions.Options;
 using FluentValidation;
-using DDDCqrsEs.Application.Commands.ToDoCommands;
-using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.AspNetCore.Antiforgery;
 using DDDCqrsEs.Domain.Entities;
 using Quotation.Domain.Entities.Authentication;
@@ -36,6 +30,7 @@ using DDDCqrsEs.WebUI;
 using DDDCqrsEs.Infrastructure.Services;
 using DDDCqrsEs.Application.Services;
 using DDDCqrsEs.Application.Models.AuthenticationModels;
+using DDDCqrsEs.Application.Queries.StockQueris;
 
 namespace DDDCqrsEs.WebUI
 {
@@ -151,7 +146,7 @@ namespace DDDCqrsEs.WebUI
                     });
             });
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));
-            services.AddValidatorsFromAssembly(typeof(AddToDoCommandValidator).Assembly);
+            services.AddValidatorsFromAssembly(typeof(StockQueriesHandler).Assembly);
             services.RegisterInfrastructureComponents();
             services.RegisterApplicationServices();
             services.RegisterRepositories();
@@ -254,20 +249,7 @@ namespace DDDCqrsEs.WebUI
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");
             });
-            //TODO: See if this really needs to be removed
-            app.UseSpa(spa =>
-            {
-                // To learn more about options for serving an Angular SPA from ASP.NET Core,
-                // see https://go.microsoft.com/fwlink/?linkid=864501
-
-                spa.Options.SourcePath = "ClientApp";
-
-                if (env.IsDevelopment())
-                {
-                    spa.UseAngularCliServer(npmScript: "start");
-                }
-            });
-
+            
             app.Use(async (context, next) =>
             {
                 context.Response.Headers.Add("X-Content-Type-Options", "nosniff");

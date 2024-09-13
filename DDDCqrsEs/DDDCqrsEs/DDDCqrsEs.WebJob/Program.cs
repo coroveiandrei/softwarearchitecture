@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using DDDCqrsEs.Persistance.Bootstrap;
 using DDDCqrsEs.WebJob.Services;
 using System;
+using DDDCqrsEs.Application.EventHandlers;
 
 namespace DDDCqrsEs.WebJob
 {
@@ -22,7 +23,9 @@ namespace DDDCqrsEs.WebJob
             IConfiguration config = builder.Build();
             var connectionString = config.GetConnectionString("ServiceBusString");
             var queueName = config.GetConnectionString("QueueName");
-            var dbString = config.GetConnectionString("DbString"); 
+            var dbString = config.GetConnectionString("ToDoDatabase");
+            
+            var t = typeof(StockEventHandler);
 
             var services = new ServiceCollection();
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));

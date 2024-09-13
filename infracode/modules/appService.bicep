@@ -6,11 +6,10 @@ param appServiceName string
 
 param servicePlanName string
 
-param servicePlanResourceGrup string
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2022-03-01' existing = {
   name: servicePlanName
-  scope: resourceGroup(servicePlanResourceGrup)
+  scope: resourceGroup()
 }
 
 resource appServiceAppResource 'Microsoft.Web/sites@2022-03-01' = {
