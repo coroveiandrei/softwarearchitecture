@@ -8,6 +8,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using CleanArc.Application.Services;
 
 namespace CleanArc.Application.Commands.ToDoCommands
 {
@@ -18,13 +19,13 @@ namespace CleanArc.Application.Commands.ToDoCommands
     {
         private readonly IRepository _repository;
         private readonly ILogger<ToDoCommandHandler> _logger;
-        private readonly IEventDispatcher _eventDispatcher;
+        private readonly INotificationService _notificationService;
 
-        public ToDoCommandHandler(IRepository repository, ILogger<ToDoCommandHandler> logger, IEventDispatcher eventDispatcher)
+        public ToDoCommandHandler(IRepository repository, ILogger<ToDoCommandHandler> logger, INotificationService notificationService)
         {
             _repository = repository;
             _logger = logger;
-            _eventDispatcher = eventDispatcher;
+            _notificationService = notificationService;
         }
 
         public async Task<AddToDoCommandResponse> Handle(AddToDoCommand request, CancellationToken cancellationToken)
@@ -43,7 +44,8 @@ namespace CleanArc.Application.Commands.ToDoCommands
                 uow.Add(toDo);
                 await uow.SaveChangesAsync(cancellationToken);
             }
-            _eventDispatcher.Publish(new ToDoAdded(newId));
+
+            await _notificationService.NotifyAsync("New to do added");
 
             _logger.LogInformation("Finished Add task {0}", request.ToDo.Name);
             return new AddToDoCommandResponse
