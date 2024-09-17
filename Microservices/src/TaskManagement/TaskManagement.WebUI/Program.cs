@@ -17,6 +17,7 @@ using Microsoft.Extensions.Configuration;
 using TaskManagement.Domain.Entities.Authentication;
 using TaskManagement.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,7 +43,7 @@ builder.Services.AddIdentity<User, ApplicationRole>()
 var connectionString = builder.Configuration.GetConnectionString("ToDoDatabase");
 builder.Services.AddDbContext<ToDoDbContext>(options => options.UseSqlServer(connectionString));
 builder.Services.AddLocalization();
-
+builder.Logging.AddApplicationInsights();
 var app = builder.Build();
 
 // configure web-app

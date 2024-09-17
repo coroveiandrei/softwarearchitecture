@@ -11,6 +11,8 @@
     <PackageReference Include="Dapr.AspNetCore" Version="1.13.1" />
     <PackageReference Include="Dapr.Actors" Version="1.13.1" />
     <PackageReference Include="Dapr.Actors.AspNetCore" Version="1.13.1" />
+    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.22.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
   </ItemGroup>
 
   <ItemGroup>

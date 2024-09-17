@@ -12,6 +12,8 @@ builder.Services.AddDaprClient(builder => builder
     .UseGrpcEndpoint($"http://localhost:{daprGrpcPort}"));
 
 builder.Services.AddControllers().AddDapr();
+builder.Services.AddApplicationInsightsTelemetry();
+builder.Logging.AddApplicationInsights();
 
 var app = builder.Build();
 

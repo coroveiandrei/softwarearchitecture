@@ -54,6 +54,7 @@ namespace InventoryService.WebUI
              .ConfigureLogging((hostingContext, logging) =>
              {
                  logging.AddConsole();
+                 logging.AddApplicationInsights();
                  logging.AddDebug();
              });
     }
