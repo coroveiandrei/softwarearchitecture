@@ -24,6 +24,9 @@ using InventoryService.Application.Commands.StockCommands;
 using InventoryService.Application.RemoteServices;
 using InventoryService.Infrastructure.RemoteServices;
 using Dapr.Client;
+using Polly.Extensions.Http;
+using Polly;
+using System.Net.Http;
 
 namespace InventoryService.WebUI
 {
@@ -119,8 +122,10 @@ namespace InventoryService.WebUI
                     });
             });
 
+
             var daprHttpPort = Environment.GetEnvironmentVariable("DAPR_HTTP_PORT") ?? "4000";
             var daprGrpcPort = Environment.GetEnvironmentVariable("DAPR_GRPC_PORT") ?? "40000";
+
             services.AddDaprClient(builder => builder
                 .UseHttpEndpoint($"http://localhost:{daprHttpPort}")
                 .UseGrpcEndpoint($"http://localhost:{daprGrpcPort}"));

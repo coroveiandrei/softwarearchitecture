@@ -52,15 +52,17 @@ Open up http://localhost:4000 and create a stock. You should see that a location
 ![image](https://github.com/user-attachments/assets/59c968dc-500f-4f5c-8825-328e6cca7e7d)
 
 1. Inspect how InventoryService calls PlacementService
-2. Simmulate a transient failure by stopping PlacementService and opening it up after you do the call to Inventory Service. Is the call processing retried? 
-3. Simulate a long-term failure by stopping PlacementService. How many retries are made before the service abandons the call?
+2. Simulate a transient failure by uncommenting the region TransientIssue in PlacementService. Is the call processing retried? 
+3. Simulate a long-term failure by uncommenting the region related to LongTimeFailure in PlacementService. How many retries are made before the service abandons the call?
 
 ### Challenge #2 - DAPR Pub/Sub - AsyncCommunication
 ![image](https://github.com/user-attachments/assets/be798813-4fe6-450c-a4c0-4b42bef0da5c)
 
 1. Inspect how PlacementService calls TaskManagement
-2. Simmulate a transient failure by stopping TaskManagement and opening it up after the initial call. Is the message processed? 
-3. Simulate a long-term failure by  stopping TaskManagement. Start TaskManagement after a few minutes. Is the message processed?
+2. Simulate a transient failure by uncommenting the region TransientIssue in TaskManagement. Is the message reprocessed? 
+3. Simulate a long-term failure by uncommenting the region related to LongTimeFailure in TaskManagement. How many retries are made before the message is abandoned?
+
+Note: due to the way DAPR is implemented with Rabbit, the message is not re proceesed on error. Still working on a fix for this.
 
  ### Challenge #3 - Working in groups come up with a retry strategy for sync communication
  

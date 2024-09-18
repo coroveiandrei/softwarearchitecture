@@ -51,8 +51,11 @@ namespace InventoryService.Application.Commands.StockCommands
             {
                 var firstLocation = locations.First();
                 _logger.LogInformation($"Reserving {firstLocation} ");
-                await _placementService.ReserveLocation(new PlacementReservationModel(firstLocation, model.LicensePlate));
-                _logger.LogInformation($"Reservation Done for {firstLocation} ");
+                var result = await _placementService.ReserveLocation(new PlacementReservationModel(firstLocation, model.LicensePlate));
+                if(result)
+                    _logger.LogInformation($"Reservation Done for {firstLocation} ");
+                else
+                    _logger.LogInformation($"Reservation Failed for {firstLocation} ");
             }
 
             return new CreateStockCommandResponse { AggregateId = guid, Version = stockCreatedEvent.Version };

@@ -20,10 +20,10 @@ public class PlacementController : ControllerBase
     }
 
     [HttpGet("GetEligibleLocations")]
-    public async Task<string[]> GetEligibleLocations([FromQuery] int take)
+    public async Task<string[]> GetEligibleLocations([FromQuery] int? take)
     {
         _logger.LogInformation($"GetEligibleLocations {take}");
-        return await _placementRepository.GetEligiblePlacementPositions(take);
+        return await _placementRepository.GetEligiblePlacementPositions(take ?? 10);
     }
 
     [HttpPost("ReserveLocation")]
@@ -32,8 +32,27 @@ public class PlacementController : ControllerBase
         try
         {
             _logger.LogInformation($"ReservingLocation {placementReservation.Location} by {placementReservation.ObjectId}");
+            #region Bad Request
+            //return BadRequest();
+            #endregion
+
+            #region Transient Error
+            //if (new Random().NextInt64() % 2 != 0)
+            //{
+            //    _logger.LogInformation($"BadRequest {placementReservation.Location} by {placementReservation.ObjectId}");
+            //    return StatusCode(503);
+            //}
+            #endregion
+
+            #region Long time Failure
+            //_logger.LogInformation($"BadRequest {placementReservation.Location} by {placementReservation.ObjectId}");
+            //return StatusCode(503);
+            #endregion
+
+
             await _placementRepository.SavePlacementPosition(placementReservation.Location, placementReservation.ObjectId);
             await daprClient.PublishEventAsync("pubsub", "placementEvents", new PlacementReservationCreated(placementReservation.ObjectId, placementReservation.Location));
+
 
             return Ok();
         }

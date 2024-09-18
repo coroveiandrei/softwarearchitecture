@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Dapr;
 using TaskManagement.Application.Remote;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace TaskManagement.WebUI.Controllers
 {
@@ -23,6 +24,24 @@ namespace TaskManagement.WebUI.Controllers
         [Topic("pubsub", "placementEvents", "deadletters", false)]
         public async Task<ActionResult> ReceivePlacementEvent([FromBody] PlacementReservationCreated placementCreatedEvent)
         {
+            _logger.LogInformation($"Receive placement event on Location:" + placementCreatedEvent.Location);
+            #region Bad Request
+            //return BadRequest();
+            #endregion
+
+            #region Transient Error
+            //if (new Random().NextInt64() % 2 != 0)
+            //{
+            //    _logger.LogInformation($"BadRequest {placementCreatedEvent.Location} by {placementCreatedEvent.ObjectId}");
+                //return StatusCode(503);
+            //}
+            #endregion
+
+            #region Long time Failure
+            //_logger.LogInformation($"BadRequest {placementReservation.Location} by {placementReservation.ObjectId}");
+            //return StatusCode(503);
+            #endregion
+
             await Mediator.Send(placementCreatedEvent);
             return Ok();
         }
