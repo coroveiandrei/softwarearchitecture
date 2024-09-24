@@ -2,7 +2,7 @@
 
 ### Map & start the solution:
 1. Clone the repo at https://github.com/coroveiandrei/softwarearchitecture
-2. Navigate to CleanArchitecture\infra folder and run start-all.ps1. This should start a local database
+2. Make sure Docker Destkop is started, then navigate to CleanArchitecture\infra folder and run **start-all.ps1**. This should start a local database from a Docker container.
 3. Open up Visual Studio Community 2022 / VS Code with .net core 8 installed and build the project 
 4. From Visual Studio: Set CleanArc.WebUI as a startup project and run the project
 
@@ -13,7 +13,7 @@
    dotnet run --project CleanArc.WebUI
    
 5. At this point a browser windows should popup showing swagger page. If not, please open up a browser and add /swagger in the starting URL
-6. Try the login endpoint with user: admin and password: P@ssw0rd
+6. Try the login endpoint with user: **admin** and password: **P@ssw0rd**
 7. Try to add a new ToDo and then list it. If it succeeds, the project is fully configured 
 
 
@@ -29,7 +29,7 @@ The app's end users just reported a bug: They cannot see the description after c
 Can you see what is going on?
 
 ### Challenge #2
-The end users want to receive an email when they add a new todo, but just in case a new field called "ShouldNotify" is sent on True. For the sake of simplicity, that field does not have to be persisted in the database and also you can just call a webhook instead of sending emails. The service INotificationService is already in place, but something is wrong. Can you spot what it is? 
+The end users want to receive an email when they add a new todo. For the sake of simplicity, you can just call a webhook instead of sending emails. The service INotificationService is already in place, but something is wrong. Can you spot what it is? 
 
 Hint: To use notifications, you can inspect the built-in types.
 
