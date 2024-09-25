@@ -11,7 +11,7 @@ else
 dapr run `
     --app-id taskmanagementservice `
     --app-port 7000 `
-    --dapr-http-port 3700 `
+    --dapr-http-port 7300 `
     --config $configFile `
     --resources-path ../../dapr/components `
     dotnet run

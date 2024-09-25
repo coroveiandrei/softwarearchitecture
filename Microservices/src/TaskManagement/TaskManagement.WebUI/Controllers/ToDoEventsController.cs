@@ -25,21 +25,18 @@ namespace TaskManagement.WebUI.Controllers
         public async Task<ActionResult> ReceivePlacementEvent([FromBody] PlacementReservationCreated placementCreatedEvent)
         {
             _logger.LogInformation($"Receive placement event on Location:" + placementCreatedEvent.Location);
-            #region Bad Request
-            //return BadRequest();
-            #endregion
-
+            
             #region Transient Error
-            //if (new Random().NextInt64() % 2 != 0)
+            //if (new Random().NextInt64() % 3 == 0)
             //{
-            //    _logger.LogInformation($"BadRequest {placementCreatedEvent.Location} by {placementCreatedEvent.ObjectId}");
-                //return StatusCode(503);
+            //    _logger.LogInformation($"Failed to process  {placementCreatedEvent.Location} by {placementCreatedEvent.ObjectId}");
+            //    return StatusCode(503);
             //}
             #endregion
 
             #region Long time Failure
-            //_logger.LogInformation($"BadRequest {placementReservation.Location} by {placementReservation.ObjectId}");
-            //return StatusCode(503);
+            //_logger.LogInformation($"Failed to process {placementCreatedEvent.Location} by {placementCreatedEvent.ObjectId}");
+            //return StatusCode(500);
             #endregion
 
             await Mediator.Send(placementCreatedEvent);
