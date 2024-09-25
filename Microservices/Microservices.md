@@ -62,12 +62,23 @@ Open up http://localhost:4000 and create a stock. You should see that a location
 2. Simulate a transient failure by uncommenting the region TransientIssue in TaskManagement. Is the message reprocessed? 
 3. Simulate a long-term failure by uncommenting the region related to LongTimeFailure in TaskManagement. How many retries are made before the message is abandoned?
 
-Note: due to the way DAPR is implemented with Rabbit, the message is not re proceesed on error. Still working on a fix for this.
+### Challenge #3.a - Deployment strategy
 
- ### Challenge #3 - Working in groups come up with a retry strategy for sync communication
- 
+You are tasked with sketching a deployment strategy for the system above.
+1. What services would you use for hosting? Why?
+2. What pipeline technology would you use? How would you configure that? Why?
+3. Other things that you consider important
+
+
+### Challenge #3.b - Testing strategy
+
+ You are tasked with sketching a testing strategy for the system above. 
  Use this questions to get you started:
- 1. Which HTTP result codes would you retry on? Which not?
- 2. What are the timeouts after which you would retry? What kind of retry strategy would you advise using?
- 3. Think about a high-throughput environment with thousands of calls per second where the environment all of a sudden gives 500. How can you align the timeouts of the service so that after recovery not all calls are done at the same time? Can you bring up a strategy for this?
-    
+ 1. What kind of testing would you use? What use cases do you think you will cover with each of the testig strategies?
+ 2. Think about security testing
+ 3. Think about performance testing. How would you conduct this?
+ 4. Other things that you consider important
+
+  
+ 
+ 
