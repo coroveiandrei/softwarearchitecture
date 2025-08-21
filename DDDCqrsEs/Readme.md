@@ -65,17 +65,6 @@ There are two places where this check is done:
 
 Versioning is already in place; your challenge is to implement the "data was changed by another user" validation.
 
-### Challenge #4: Deploy to the Cloud
-Now, let's deploy this to the cloud.
-1. Deploy web app to an appservice. 
-See the configurations that you did in CleanArchitecture in order to make it work (configuration settings and firewall rules)
-
-2. Deploy the Webjob as an Azure function
-
-You need to create an azure function to the Stock queue and process the messages.
-- Tutorial - Creating an Azure function - https://learn.microsoft.com/en-us/azure/azure-functions/create-first-function-vs-code-csharp
-- Use Service Bus trigger instead of HTTP - https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-service-bus-trigger?tabs=python-v2%2Cisolated-process%2Cnodejs-v4%2Cextensionv5&pivots=programming-language-csharp
-
 
 
 
