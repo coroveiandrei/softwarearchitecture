@@ -22,14 +22,11 @@ Inspect the solution and make sense of all the projects and the relationship bet
 Could you look over the project dependencies and determine where the API call lands initially and how it goes through the onion layers to the business logic and infra layer? Try to draw a diagram if you find it easier.
 
 ### Chalenge #1 
-
 The app's end users just reported a bug: They cannot see the description after creating a to-do. 
 Can you see what is going on?
 
 ### Challenge #2
 The end users want to receive an email when they add a new Todo. For the sake of simplicity, you can just call a webhook instead of sending emails. The service INotificationService is already in place, but something is wrong. Can you spot what it is? 
-
-Hint: To use notifications, you can inspect the built-in types.
 
 ### Challenge #3
 Your manager has decided that SQL is too expensive and would like to migrate the database to Azure Table Storage, which he believes is less expensive. You have been tasked with conducting an initial analysis and estimating the changes required for this migration. What classes or projects would be involved in this migration?
