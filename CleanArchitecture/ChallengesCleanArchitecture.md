@@ -2,28 +2,22 @@
 
 ### Map & start the solution:
 1. Make sure Docker Desktop is started, then navigate to CleanArchitecture\infra folder and run **start-all.ps1**. This should start a local database from a Docker container.
-2. Open up Visual Studio Community 2022 / VS Code with .net core 8 installed and build the project 
-3. From Visual Studio: Set CleanArc.WebUI as a startup project and run the project
-
-   From VSCode: run
-
-   dotnet build
-
-   dotnet run --project CleanArc.WebUI
+2. Open up VS Code with .net core 8 installed and build the project 
+      
+   ````dotnet build````
+   ````dotnet run --project CleanArc.WebUI ``` 
    
-4. At this point, a browser window should pop up showing Swagger page. If not, please open up a browser and add /swagger in the starting URL
-5. Try the login endpoint with user: **admin** and password: **P@ssw0rd**
-6. Try to add a new ToDo and then list it. If it succeeds, the project is fully configured 
-
+3. At this point, a browser window should pop up showing Swagger page. If not, please open up a browser and add /swagger in the starting URL
+4. Try the login endpoint with user: **admin** and password: **P@ssw0rd**
+5. Try to add a new ToDo and then list it. If it succeeds, the project is fully configured 
 
 ### Chalenge #0
-
-Inspect the solution and make sense of all the projects and the relationship between them.
-Could you look over the project dependencies and determine where the API call lands initially and how it goes through the onion layers to the business logic and infra layer? Try to draw a diagram if you find it easier.
+Inspect the solution and investigate the project structure and dependencies between them.
+Determine where the API call lands initially and how it goes through the onion layers to the business logic and infra layer? Try to draw a diagram if you find it easier.
 
 ### Chalenge #1 
 The app's end users just reported a bug: They cannot see the description after creating a to-do. 
-Can you see what is going on?
+Fix the bug
 
 ### Challenge #2
 The end users want to receive an email when they add a new Todo. For the sake of simplicity, you can just call a webhook instead of sending emails. The service INotificationService is already in place, but something is wrong. Can you spot what it is? 
