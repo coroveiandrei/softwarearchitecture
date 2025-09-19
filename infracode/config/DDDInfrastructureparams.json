@@ -5,7 +5,7 @@
     "storageAccounts": {
       "value": [
         {
-          "name": "andreicorostor", 
+          "name": "[name]stor", 
           "blobs": [],
           "shares": [],
           "queues": [],
@@ -25,9 +25,9 @@
     "sqlServers": {
       "value": [          
           {
-          "name": "andreicorosqlserver",
-          "database": "andreicorodb",
-          "username": "andrei",
+          "name": "[name]dddsqlserver",
+          "database": "[name]ddddb",
+          "username": "[name]",
           "password": "P@ssw0rd98763123",
           "publicNetworkAccess": "Enabled"
           }
@@ -36,7 +36,7 @@
     "serviceBuses": {
       "value": [
         {
-          "name": "andreicorosb",
+          "name": "[name]dddsb",
           "sku": "Standard"
         }
       ]

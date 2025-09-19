@@ -6,7 +6,7 @@
     "appServicePlans": {
       "value": [
         {
-          "name": "arcandreiappserviceplan",
+          "name": "[name]appserviceplan",
           "sku": "S1"
         }
       ]
@@ -14,8 +14,8 @@
     "appServices": {
       "value": [
         {
-          "name": "arcacappservice",
-          "servicePlanName": "arcandreiappserviceplan"
+          "name": "[name]service",
+          "servicePlanName": "[name]appserviceplan"
         }
       ]
     }

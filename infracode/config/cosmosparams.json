@@ -4,8 +4,7 @@
     "parameters": {
     "cosmosServers": {
         "value": [{
-            "name": "arcaccosmos",
-            "rg": "arc"
+            "name": "[name]cosmos"
         }]
     }
     }
