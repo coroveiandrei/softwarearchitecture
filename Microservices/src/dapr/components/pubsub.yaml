@@ -2,7 +2,7 @@ apiVersion: dapr.io/v1alpha1
 kind: Component
 metadata:
   name: pubsub
-  namespace: dapr-placementservice
+  namespace: dapr-stockplacementservice
 spec:
   type: pubsub.rabbitmq
   version: v1
@@ -20,5 +20,5 @@ spec:
   - name: concurrency
     value: parallel
 scopes:
-  - placementservice
+  - stockplacementservice
   - taskmanagementservice

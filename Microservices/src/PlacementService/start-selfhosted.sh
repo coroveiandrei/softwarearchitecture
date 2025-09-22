@@ -9,7 +9,7 @@ else
 fi
 
 dapr run \
-    --app-id placementservice \
+    --app-id stockplacementservice \
     --app-port 6000 \
     --dapr-http-port 3600 \
     --dapr-grpc-port 60000 \

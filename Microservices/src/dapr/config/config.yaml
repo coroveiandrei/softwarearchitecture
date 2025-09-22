@@ -7,15 +7,26 @@ spec:
     samplingRate: "1"
     zipkin:
       endpointAddress: "http://localhost:9411/api/v2/spans"
+
+  # Consul-based service discovery
+  features:
+    - name: service.discovery.useMdns
+      enabled: false          # disable mDNS
+    - name: service.discovery.consul
+      enabled: true
+      metadata:
+        host: "localhost:8500"   # Consul agent address
+        scheme: "http"
+
   resiliency:
     policies:
       retries:
         myRetryPolicy:
           maxRetries: 5
           backoff:
-            duration: 100ms  # Time to wait between retries
-            maxDuration: 5s   # Maximum duration to wait between retries
-            factor: 2         # Exponential backoff factor
+            duration: 100ms
+            maxDuration: 5s
+            factor: 2
     targets:
       - name: taskmanagementservice
         retries:

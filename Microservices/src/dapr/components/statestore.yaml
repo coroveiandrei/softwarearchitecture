@@ -2,7 +2,7 @@ apiVersion: dapr.io/v1alpha1
 kind: Component
 metadata:
   name: statestore
-  namespace: dapr-placementservice
+  namespace: dapr-stockplacementservice
 spec:
   type: state.redis
   version: v1
@@ -14,6 +14,6 @@ spec:
       name: state.redisPassword
       key: state.redisPassword
 auth:
-  secretStore: placementservice-secrets
+  secretStore: stockplacementservice-secrets
 scopes:
-  - placementservice
+  - stockplacementservice

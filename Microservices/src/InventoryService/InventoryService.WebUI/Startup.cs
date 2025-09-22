@@ -139,7 +139,7 @@ namespace InventoryService.WebUI
 
             services.AddSingleton<IPlacementService>(_ =>
                 new PlacementService(DaprClient.CreateInvokeHttpClient(
-                "placementservice", $"http://localhost:{daprHttpPort}")));
+                "stockplacementservice", $"http://localhost:{daprHttpPort}")));
 
             services.AddCsp(nonceByteAmount: 32);
             

@@ -9,10 +9,11 @@ else
 } 
 
 dapr run `
-    --app-id placementservice `
+    --app-id stockplacementservice `
     --app-port 6000 `
     --dapr-http-port 3600 `
     --dapr-grpc-port 60000 `
     --config $configFile `
     --resources-path ../dapr/components `
+    --log-level debug `
     dotnet run
