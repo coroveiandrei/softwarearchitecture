@@ -8,6 +8,15 @@ spec:
     zipkin:
       endpointAddress: "http://localhost:9411/api/v2/spans"
 
+  # Explicit name resolution configuration for Consul
+  nameResolution:
+    component: "consul"
+    configuration:
+      selfRegister: true
+      client:
+        address: "localhost:8500"
+        scheme: "http"
+
   # Consul-based service discovery
   features:
     - name: service.discovery.useMdns
