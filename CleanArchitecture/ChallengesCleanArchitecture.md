@@ -29,15 +29,33 @@ Your manager has decided that SQL is too expensive and would like to migrate the
 
 
 ### Challenge #4
-Deploy this architecture on an Azure stack and run it on Azure. What services from the ones created previously would you need?
+1. Deploy this architecture on an Azure stack and run it on Azure. What services from the ones created previously would you need?
+Provision the Appservice and Sql database
 
-1. Go to Azure Portal and grab the connection string of Azure SQL DB created in the last lab. If you don't have it, you can always redeploy the template
+````az deployment group create --resource-group  rg-andrei-corovei --template-file 3appservice.bicep --parameters .\config\appserviceparams.json````
+
+````az deployment group create --resource-group  rg-andrei-corovei --template-file 4sqlserver.bicep --parameters .\config\sqlserverparams.json````
+
+2. Go to Azure Portal and grab the connection string of Azure SQL DB created.
 
 The connection string should look like this:
 ````Server=tcp:[CHANGEMESERVER].database.windows.net,1433;Initial Catalog=arcacsqldb;Persist Security Info=False;User ID=andrei;Password=[CHANGEME];MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;````
 
-2. In SQL Server also make sure firewall rules are open for your ip address
-3. Go to appsettings.json and replace ToDoDatabase with the connection string above
-4. Provision an AppService in Azure 
+3. In SQL Server also make sure firewall rules are open for your ip address
+4. Go to appsettings.json and replace ToDoDatabase with the connection string above
 
-Enable Azure services access to the database from network configuration.
+
+````
+# 1. Navigate to project folder
+cd C:\code\softwarearchitecture\CleanArchitecture\CleanArc\CleanArc.WebUI
+# 2. Publish the .NET app (run from your project directory)
+dotnet publish -c Release
+# 3. Create a zip archive of the publish output
+Compress-Archive -Path C:\code\softwarearchitecture\CleanArchitecture\CleanArc\CleanArc.WebUI\bin\Release\net8.0\publish\* -DestinationPath C:\code\softwarearchitecture\CleanArchitecture\CleanArc\CleanArc.WebUI\publish.zip
+# 4. Set env variable
+az webapp config appsettings set --resource-group [RGNAME] --name [APPSERVICENAME] --settings ASPNETCORE_ENVIRONMENT=Development
+# 5. Deploy the zip to Azure Web App
+az webapp deploy --resource-group [RGNAME] --name [APPSERVICENAME] --src-path C:\code\softwarearchitecture\CleanArchitecture\CleanArc\CleanArc.WebUI\publish.zip --type zip
+````
+Remember to type /swagger at the end of the URL!!!
+
