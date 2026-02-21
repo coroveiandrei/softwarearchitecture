@@ -1,0 +1,36 @@
+name: Export Markdown to PDF
+
+on:
+  push:
+    paths:
+      - 'CloudNativeMicroservices.md'
+  workflow_dispatch:
+
+jobs:
+  export-pdf:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pandoc and LaTeX
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc texlive-xetex texlive-fonts-recommended texlive-plain-generic
+
+      - name: Convert Markdown to PDF
+        run: |
+          pandoc CloudNativeMicroservices.md \
+            --pdf-engine=xelatex \
+            -V geometry:margin=1in \
+            -V fontsize=11pt \
+            -o CloudNativeMicroservices.pdf
+
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CloudNativeMicroservices-PDF
+          path: CloudNativeMicroservices.pdf
+          retention-days: 30
