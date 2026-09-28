@@ -34,8 +34,6 @@ namespace DDDCqrsEs.Application.Commands.StockCommands
             var model = ModelMapper.ConvertCommandToModel(request);
             var stockCreatedEvent = stockAggregate.Create(model);
 
-            await _eventStore.SaveEvent(stockCreatedEvent, cancellationToken);
-
             return new CreateStockCommandResponse { AggregateId = guid, Version = stockCreatedEvent.Version };
         }
 
@@ -50,8 +48,6 @@ namespace DDDCqrsEs.Application.Commands.StockCommands
             var model = ModelMapper.ConvertCommandToModel(request);
             var stockUpdatedEvent = stockAggregate.Update(model); 
 
-            await _eventStore.SaveEvent(stockUpdatedEvent, cancellationToken);
-
             return new UpdateStockCommandResponse { AggregateId = stockUpdatedEvent.AggregateId, Version = stockUpdatedEvent.Version };
         }
 
@@ -64,8 +60,6 @@ namespace DDDCqrsEs.Application.Commands.StockCommands
 
             var stockDeletedEvent = stockAggregate.Delete();
 
-            await _eventStore.SaveEvent(stockDeletedEvent, cancellationToken);
-            
             return new DeleteStockCommandResponse {AggregateId = stockDeletedEvent.AggregateId, Version = stockDeletedEvent.Version };
         }
     }
