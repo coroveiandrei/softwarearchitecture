@@ -36,7 +36,6 @@ namespace DDDCqrsEs.Application.Commands.StockCommands
             var model = ModelMapper.ConvertCommandToModel(request);
             var stockCreatedEvent = stockAggregate.Create(model);
 
-            // Challenge #1 persists the event. Challenge #2 publishes it only after persistence succeeds.
             return new CreateStockCommandResponse { AggregateId = guid, Version = stockCreatedEvent.Version };
         }
 
@@ -51,7 +50,6 @@ namespace DDDCqrsEs.Application.Commands.StockCommands
             var model = ModelMapper.ConvertCommandToModel(request);
             var stockUpdatedEvent = stockAggregate.Update(model); 
 
-            // Challenge #1 persists the event. Challenge #2 publishes it only after persistence succeeds.
             return new UpdateStockCommandResponse { AggregateId = stockUpdatedEvent.AggregateId, Version = stockUpdatedEvent.Version };
         }
 
@@ -64,7 +62,6 @@ namespace DDDCqrsEs.Application.Commands.StockCommands
 
             var stockDeletedEvent = stockAggregate.Delete();
 
-            // Challenge #1 persists the event. Challenge #2 publishes it only after persistence succeeds.
             return new DeleteStockCommandResponse {AggregateId = stockDeletedEvent.AggregateId, Version = stockDeletedEvent.Version };
         }
     }
