@@ -9,6 +9,11 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentValidation;
+using FluentValidation.Results;
+using System.Collections.Generic;
+using DDDCqrsEs.Domain.Models;
+using DDDCqrsEs.Domain.Exceptions;
 
 namespace DDDCqrsEs.Application.Commands.StockCommands
 {
@@ -42,6 +47,7 @@ namespace DDDCqrsEs.Application.Commands.StockCommands
         public async Task<UpdateStockCommandResponse> Handle(UpdateStockCommand request, CancellationToken cancellationToken)
         {
             var eventsSoFar = await _eventStore.GetEventsByAggregateId(request.Id, cancellationToken).ToListAsync(cancellationToken);
+            EnsureExpectedVersion(request.Version, eventsSoFar);
             var baseEvents = EventMapper.ConvertStoredEvents(eventsSoFar);
             var stockAggregate = new Stock(request.Id);
 
@@ -58,6 +64,7 @@ namespace DDDCqrsEs.Application.Commands.StockCommands
         public async Task<DeleteStockCommandResponse> Handle(DeleteStockCommand request, CancellationToken cancellationToken)
         {
             var eventsSoFar = await _eventStore.GetEventsByAggregateId(request.Id, cancellationToken).ToListAsync(cancellationToken);
+            EnsureExpectedVersion(request.Version, eventsSoFar);
             var baseEvents = EventMapper.ConvertStoredEvents(eventsSoFar);
             var stockAggregate = new Stock(request.Id);
             stockAggregate.ReconstituteFromEvents(baseEvents);
@@ -67,6 +74,18 @@ namespace DDDCqrsEs.Application.Commands.StockCommands
             await _eventStore.SaveEvent(stockDeletedEvent, cancellationToken);
             
             return new DeleteStockCommandResponse {AggregateId = stockDeletedEvent.AggregateId, Version = stockDeletedEvent.Version };
+        }
+
+        private static void EnsureExpectedVersion(int expectedVersion, IReadOnlyList<StoredEvent> storedEvents)
+        {
+            var currentVersion = storedEvents.Count == 0 ? 0 : storedEvents.Max(storedEvent => storedEvent.Version);
+            if (currentVersion != expectedVersion)
+            {
+                throw new ValidationException(new[]
+                {
+                    new ValidationFailure(nameof(UpdateStockCommand.Version), OptimisticConcurrencyException.DefaultMessage)
+                });
+            }
         }
     }
 }

@@ -29,23 +29,33 @@ namespace DDDCqrsEs.Persistance.Repositories
         public StockProjection GetStockById(Guid id)
         {
             var stock = dbContext.Stocks.FirstOrDefault(s => s.Id == id);
-            stock.BestBeforeDate = stock.BestBeforeDate.ToLocalTime();
+            if (stock != null)
+            {
+                stock.BestBeforeDate = stock.BestBeforeDate.ToLocalTime();
+            }
             return stock;
         }
 
         public void CreateStock(StockProjection stock)
         {
+            var existingStock = dbContext.Stocks.FirstOrDefault(s => s.Id == stock.Id);
+            if (existingStock != null)
+            {
+                return;
+            }
+
             dbContext.Add(stock);
             dbContext.SaveChanges();
         }
 
-        public void DeleteStock(Guid stockId)
+        public void DeleteStock(Guid stockId, int version)
         {
 
             var stockToBeDeleted = dbContext.Stocks.FirstOrDefault(s => s.Id == stockId);
-            if (stockToBeDeleted != null)
+            if (stockToBeDeleted != null && stockToBeDeleted.Version < version)
             {
                 stockToBeDeleted.Status = StockStatusValues.CLOSED;
+                stockToBeDeleted.Version = version;
                 dbContext.SaveChanges();
             }
 
@@ -55,7 +65,7 @@ namespace DDDCqrsEs.Persistance.Repositories
         {
 
             var stockToBeUpdated = dbContext.Stocks.FirstOrDefault(s => s.Id == stockId);
-            if (stockToBeUpdated != null)
+            if (stockToBeUpdated != null && stockToBeUpdated.Version < version)
             {
                 ModelMapper.MapModelIntoProjection(stockToBeUpdated, stock);
                 stockToBeUpdated.Version = version;

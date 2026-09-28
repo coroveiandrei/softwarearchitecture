@@ -4,6 +4,8 @@ using DDDCqrsEs.Domain.Models;
 using DDDCqrsEs.Domain.Repositories;
 using DDDCqrsEs.Persistance.DataModel;
 using Microsoft.WindowsAzure.Storage.Table;
+using Microsoft.WindowsAzure.Storage;
+using DDDCqrsEs.Domain.Exceptions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -33,7 +35,14 @@ namespace DDDCqrsEs.Persistance.Repositories
 
             var table = await _connectionCreator.CreateConnection(nameof(EventStore));
             cancellationToken.ThrowIfCancellationRequested();
-            await table.ExecuteAsync(TableOperation.Insert(entity));
+            try
+            {
+                await table.ExecuteAsync(TableOperation.Insert(entity));
+            }
+            catch (StorageException exception) when (exception.RequestInformation?.HttpStatusCode == 409)
+            {
+                throw new OptimisticConcurrencyException(exception);
+            }
         }
 
         public async IAsyncEnumerable<StoredEvent> GetEventsByAggregateId(Guid id,
