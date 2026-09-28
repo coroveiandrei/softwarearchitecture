@@ -51,12 +51,6 @@ As an extension, replace the directly constructed `HttpClient` with an injected 
 
 Work in groups of three or four. A manager believes that Azure SQL is too expensive and proposes moving the ToDo data to Azure Table Storage.
 
-Treat the proposal as a hypothesis. Prepare a short architecture decision record that covers:
-
-- The classes, interfaces, and projects that would need to change.
-- For each affected class, whether the team would modify it, replace it, or introduce a new implementation.
-- Any abstractions that currently assume Entity Framework or relational transactions.
-- The classes and projects that should remain unchanged, with a brief explanation.
-- Your recommendation and a rough implementation estimate.
+Identify which classes and projects would change to replace Azure SQL with Azure Table Storage in this Clean Architecture solution. Compare that change surface with a system where persistence code is spread throughout the business logic. Explain what the difference reveals about the value and limitations of the architecture.
 
 Each group has 20 minutes to prepare and 5 minutes to present. Other groups should challenge one assumption or trade-off in the proposal.
