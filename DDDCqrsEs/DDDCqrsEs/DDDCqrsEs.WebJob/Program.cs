@@ -18,7 +18,8 @@ namespace DDDCqrsEs.WebJob
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false);
+                .AddJsonFile("appsettings.json", optional: false)
+                .AddEnvironmentVariables();
 
             IConfiguration config = builder.Build();
             var connectionString = config.GetConnectionString("ServiceBusString");

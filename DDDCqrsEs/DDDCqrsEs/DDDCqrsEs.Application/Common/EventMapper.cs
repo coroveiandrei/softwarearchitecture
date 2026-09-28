@@ -1,38 +1,36 @@
 ﻿using Newtonsoft.Json;
-using DDDCqrsEs.Domain.Entities;
 using DDDCqrsEs.Domain.Events;
 using DDDCqrsEs.Domain.Models;
-using DDDCqrsEs.Persistance.DataModel;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace DDDCqrsEs.Application.Common
 {
     public class EventMapper
     {
-        public static BaseEvent ConvertFromEntityToBase(EventEntity _event)
+        public static BaseEvent ConvertFromStoredEvent(StoredEvent storedEvent)
         {
-            var stockData = JsonConvert.DeserializeObject<StockModel>(_event.Data);
+            var stockData = JsonConvert.DeserializeObject<StockModel>(storedEvent.Data);
 
-            switch (_event.EventType)
+            switch (storedEvent.EventType)
             {
                 case "StockCreated":
-                    return new StockCreated(stockData, new Guid(_event.PartitionKey));
+                    return new StockCreated(stockData, storedEvent.AggregateId, storedEvent.Version, storedEvent.TimeStamp);
                 case "StockUpdated":
-                    return new StockUpdated(stockData, new Guid(_event.PartitionKey));
+                    return new StockUpdated(stockData, storedEvent.AggregateId, storedEvent.Version, storedEvent.TimeStamp);
                 case "StockDeleted":
-                    return new StockDeleted(new Guid(_event.PartitionKey));
+                    return new StockDeleted(storedEvent.AggregateId, storedEvent.Version, storedEvent.TimeStamp);
+                default:
+                    throw new InvalidOperationException($"Unknown event type '{storedEvent.EventType}'.");
             }
-            return new BaseEvent();
         }
 
-        public static List<BaseEvent> ConvertListOfEntityEventsToBase(IEnumerable<EventEntity> _events)
+        public static List<BaseEvent> ConvertStoredEvents(IEnumerable<StoredEvent> storedEvents)
         {
             List<BaseEvent> baseEvents = new List<BaseEvent>();
-            foreach(var _event in _events)
+            foreach(var storedEvent in storedEvents)
             {
-                baseEvents.Add(ConvertFromEntityToBase(_event));
+                baseEvents.Add(ConvertFromStoredEvent(storedEvent));
             }
             return baseEvents;
         }

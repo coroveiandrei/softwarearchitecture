@@ -1,17 +1,17 @@
 ﻿using DDDCqrsEs.Domain.Events;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using DDDCqrsEs.Application.Repositories.Base;
 using System.Threading.Tasks;
-using DDDCqrsEs.Persistance.DataModel;
+using System.Threading;
+using DDDCqrsEs.Domain.Models;
 
 namespace DDDCqrsEs.Domain.Repositories
 {
     public interface IEventStore
     {
-        public IAsyncEnumerable<EventEntity> GetEventsByAggregateId(Guid id);
-        public IAsyncEnumerable<EventEntity> GetAllEvents();
-        public Task SaveEvent(BaseEvent _event);
+        IAsyncEnumerable<StoredEvent> GetEventsByAggregateId(Guid id, CancellationToken cancellationToken = default);
+        IAsyncEnumerable<StoredEvent> GetPendingEvents(CancellationToken cancellationToken = default);
+        Task SaveEvent(BaseEvent domainEvent, CancellationToken cancellationToken = default);
+        Task MarkEventPublished(Guid aggregateId, int version, CancellationToken cancellationToken = default);
     }
 }

@@ -2,6 +2,7 @@
 using Azure.Messaging.ServiceBus;
 using Newtonsoft.Json;
 using DDDCqrsEs.Domain.Events;
+using System.Threading;
 
 namespace DDDCqrsEs.Application.Services
 {
@@ -16,20 +17,15 @@ namespace DDDCqrsEs.Application.Services
             _queueName = queueName;
         }
 
-        public async Task PublishEvent(BaseEvent _event)
+        public async Task PublishEvent(BaseEvent domainEvent, CancellationToken cancellationToken = default)
         {
             await using (var client = new ServiceBusClient(_connectionString))
             {
                 var sender = client.CreateSender(_queueName);
 
-                JsonSerializerSettings settings = new JsonSerializerSettings
-                {
-                    TypeNameHandling = TypeNameHandling.All
-                };
-
-                var serializedMessage = JsonConvert.SerializeObject(_event);
+                var serializedMessage = JsonConvert.SerializeObject(domainEvent);
                 var message = new ServiceBusMessage(serializedMessage);
-                await sender.SendMessageAsync(message);
+                await sender.SendMessageAsync(message, cancellationToken);
             } 
         }
     }

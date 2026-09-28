@@ -27,7 +27,12 @@ namespace DDDCqrsEs.Domain.Aggregates
 
         public void AddEvent(IBaseEvent _event)
         {
-            _event.Version = GetNextVersion();
+            if (_event is not BaseEvent domainEvent)
+            {
+                throw new ArgumentException("Only domain events can be added to an aggregate.", nameof(_event));
+            }
+
+            domainEvent.AssignVersion(GetNextVersion());
             Events.Add(_event);
         }
 

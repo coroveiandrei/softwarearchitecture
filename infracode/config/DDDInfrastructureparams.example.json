@@ -5,38 +5,33 @@
     "storageAccounts": {
       "value": [
         {
-          "name": "[name]stor", 
-          "blobs": [],
-          "shares": [],
-          "queues": [],
-          "tables": [],
+          "name": "changemestorageaccount",
           "kind": "StorageV2",
           "sku": {
             "name": "Standard_LRS",
             "tier": "Standard"
           },
           "properties": {
-            "publicNetworkAccess": "Enabled",
-            "networkAcls": {}
+            "publicNetworkAccess": "Enabled"
           }
         }
       ]
     },
     "sqlServers": {
-      "value": [          
-          {
-          "name": "[name]dddsqlserver",
-          "database": "[name]ddddb",
-          "username": "[name]",
-          "password": "P@ssw0rd98763123",
+      "value": [
+        {
+          "name": "change-me-sql-server",
+          "database": "change-me-database",
+          "username": "change-me-admin",
+          "password": "CHANGE_ME",
           "publicNetworkAccess": "Enabled"
-          }
-          ]
-        },
+        }
+      ]
+    },
     "serviceBuses": {
       "value": [
         {
-          "name": "[name]dddsb",
+          "name": "change-me-service-bus",
           "sku": "Standard"
         }
       ]

@@ -19,13 +19,11 @@ namespace DDDCqrsEs.Application.Commands.StockCommands
                                         IRequestHandler<DeleteStockCommand, DeleteStockCommandResponse>
     {
 
-        private IEventStore _eventRepository;
-        private IBaseEventPublisher _eventPublisher;
+        private readonly IEventStore _eventStore;
 
-        public StockCommandHandler(IEventStore eventRepository, IBaseEventPublisher serviceBusPublisher)
+        public StockCommandHandler(IEventStore eventStore)
         {
-            _eventRepository = eventRepository;
-            _eventPublisher = serviceBusPublisher;
+            _eventStore = eventStore;
         }
 
         public async Task<CreateStockCommandResponse> Handle(CreateStockCommand request, CancellationToken cancellationToken)
@@ -36,13 +34,15 @@ namespace DDDCqrsEs.Application.Commands.StockCommands
             var model = ModelMapper.ConvertCommandToModel(request);
             var stockCreatedEvent = stockAggregate.Create(model);
 
+            await _eventStore.SaveEvent(stockCreatedEvent, cancellationToken);
+
             return new CreateStockCommandResponse { AggregateId = guid, Version = stockCreatedEvent.Version };
         }
 
         public async Task<UpdateStockCommandResponse> Handle(UpdateStockCommand request, CancellationToken cancellationToken)
         {
-            var eventsSoFar = await _eventRepository.GetEventsByAggregateId(request.Id).ToListAsync();
-            var baseEvents = EventMapper.ConvertListOfEntityEventsToBase(eventsSoFar);
+            var eventsSoFar = await _eventStore.GetEventsByAggregateId(request.Id, cancellationToken).ToListAsync(cancellationToken);
+            var baseEvents = EventMapper.ConvertStoredEvents(eventsSoFar);
             var stockAggregate = new Stock(request.Id);
 
             stockAggregate.ReconstituteFromEvents(baseEvents);
@@ -50,17 +50,21 @@ namespace DDDCqrsEs.Application.Commands.StockCommands
             var model = ModelMapper.ConvertCommandToModel(request);
             var stockUpdatedEvent = stockAggregate.Update(model); 
 
+            await _eventStore.SaveEvent(stockUpdatedEvent, cancellationToken);
+
             return new UpdateStockCommandResponse { AggregateId = stockUpdatedEvent.AggregateId, Version = stockUpdatedEvent.Version };
         }
 
         public async Task<DeleteStockCommandResponse> Handle(DeleteStockCommand request, CancellationToken cancellationToken)
         {
-            var eventsSoFar = await _eventRepository.GetEventsByAggregateId(request.Id).ToListAsync();
-            var baseEvents = EventMapper.ConvertListOfEntityEventsToBase(eventsSoFar);
+            var eventsSoFar = await _eventStore.GetEventsByAggregateId(request.Id, cancellationToken).ToListAsync(cancellationToken);
+            var baseEvents = EventMapper.ConvertStoredEvents(eventsSoFar);
             var stockAggregate = new Stock(request.Id);
             stockAggregate.ReconstituteFromEvents(baseEvents);
 
             var stockDeletedEvent = stockAggregate.Delete();
+
+            await _eventStore.SaveEvent(stockDeletedEvent, cancellationToken);
             
             return new DeleteStockCommandResponse {AggregateId = stockDeletedEvent.AggregateId, Version = stockDeletedEvent.Version };
         }

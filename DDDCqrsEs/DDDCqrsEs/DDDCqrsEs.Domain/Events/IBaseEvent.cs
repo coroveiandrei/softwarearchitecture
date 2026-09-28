@@ -10,9 +10,9 @@ namespace DDDCqrsEs.Domain.Events
     public interface IBaseEvent : IRequest
     {
         public DateTime TimeStamp { get; }
-        public string EventType { get; set; }
-        public Guid AggregateId { get; set; }
-        public StockModel Stock { get; set; }
-        public int Version { get; set; }
+        public string EventType { get; }
+        public Guid AggregateId { get; }
+        public StockModel Stock { get; }
+        public int Version { get; }
     }
 }
