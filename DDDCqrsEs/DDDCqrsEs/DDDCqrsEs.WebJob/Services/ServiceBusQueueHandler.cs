@@ -5,6 +5,7 @@ using DDDCqrsEs.Domain.Events;
 using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using System.Threading;
 
 namespace DDDCqrsEs.WebJob.Services
 {
@@ -34,10 +35,16 @@ namespace DDDCqrsEs.WebJob.Services
             };
             var typedEvent = (BaseEvent)JsonConvert.DeserializeObject(messageBody, eventType);
 
-            // Challenge #2 dispatches the typed event so the projection handler can update SQL.
+            await DispatchEvent(typedEvent);
+
             Console.WriteLine($"Received {typedEvent.EventType} for stock with id {typedEvent.AggregateId}");
 
             await message.CompleteMessageAsync(message.Message);
+        }
+
+        internal Task DispatchEvent(BaseEvent domainEvent, CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
         }
 
         public async Task HandleError(ProcessErrorEventArgs message)

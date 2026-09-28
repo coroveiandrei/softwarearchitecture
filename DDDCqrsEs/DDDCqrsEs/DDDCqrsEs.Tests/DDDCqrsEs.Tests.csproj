@@ -6,6 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="NSubstitute" Version="5.3.0" />
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
       <PrivateAssets>all</PrivateAssets>
@@ -15,5 +16,6 @@
   <ItemGroup>
     <ProjectReference Include="..\DDDCqrsEs.Application\DDDCqrsEs.Application.csproj" />
     <ProjectReference Include="..\DDDCqrsEs.Domain\DDDCqrsEs.Domain.csproj" />
+    <ProjectReference Include="..\DDDCqrsEs.WebJob\DDDCqrsEs.WebJob.csproj" />
   </ItemGroup>
 </Project>

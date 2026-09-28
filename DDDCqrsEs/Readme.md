@@ -71,7 +71,7 @@ Hint: Create a queue named `StockEvents` in the Service Bus namespace.
 
 The challenge is complete when the stock appears in SQL.
 
-After it works, consider this failure: Table Storage accepts the event, but Service Bus is temporarily unavailable. The command fails after the write model has already changed, and the read model may never receive the event. Be prepared to explain why this is a dual-write problem and how a transactional outbox would address it. The participant template intentionally does not include the outbox solution.
+After it works, consider this failure: Table Storage accepts the event, but Service Bus is temporarily unavailable. The command fails after the write model has already changed, and the read model may never receive the event. What consistency problem does this create, and how could the design guarantee that the event is eventually published without undoing the persisted write?
 
 ### Challenge #3: Versioning and concurrency
 
