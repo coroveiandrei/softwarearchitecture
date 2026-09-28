@@ -10,8 +10,6 @@ namespace DDDCqrsEs.Domain.Repositories
     public interface IEventStore
     {
         IAsyncEnumerable<StoredEvent> GetEventsByAggregateId(Guid id, CancellationToken cancellationToken = default);
-        IAsyncEnumerable<StoredEvent> GetPendingEvents(CancellationToken cancellationToken = default);
         Task SaveEvent(BaseEvent domainEvent, CancellationToken cancellationToken = default);
-        Task MarkEventPublished(Guid aggregateId, int version, CancellationToken cancellationToken = default);
     }
 }

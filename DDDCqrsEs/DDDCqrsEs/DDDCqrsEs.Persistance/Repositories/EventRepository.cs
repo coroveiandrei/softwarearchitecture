@@ -27,8 +27,7 @@ namespace DDDCqrsEs.Persistance.Repositories
             {
                 EventType = domainEvent.EventType,
                 Data = JsonConvert.SerializeObject(domainEvent.Stock),
-                TimeCreated = domainEvent.TimeStamp,
-                IsPublished = false
+                TimeCreated = domainEvent.TimeStamp
             };
 
             var table = await _connectionCreator.CreateConnection(nameof(EventStore));
@@ -46,42 +45,6 @@ namespace DDDCqrsEs.Persistance.Repositories
             {
                 yield return storedEvent;
             }
-        }
-
-        public async IAsyncEnumerable<StoredEvent> GetPendingEvents(
-            [EnumeratorCancellation] CancellationToken cancellationToken = default)
-        {
-            var filter = TableQuery.GenerateFilterConditionForBool(nameof(EventEntity.IsPublished), QueryComparisons.Equal, false);
-            var query = new TableQuery<EventEntity>().Where(filter);
-
-            await foreach (var storedEvent in ExecuteQuery(query, cancellationToken))
-            {
-                yield return storedEvent;
-            }
-        }
-
-        public async Task MarkEventPublished(Guid aggregateId, int version, CancellationToken cancellationToken = default)
-        {
-            var table = await _connectionCreator.CreateConnection(nameof(EventStore));
-            cancellationToken.ThrowIfCancellationRequested();
-            var result = await table.ExecuteAsync(
-                TableOperation.Retrieve<EventEntity>(aggregateId.ToString(), version.ToString("D10")));
-            var entity = result.Result as EventEntity;
-            if (entity == null)
-            {
-                result = await table.ExecuteAsync(
-                    TableOperation.Retrieve<EventEntity>(aggregateId.ToString(), version.ToString()));
-                entity = result.Result as EventEntity;
-            }
-
-            if (entity == null)
-            {
-                throw new InvalidOperationException($"Event {aggregateId}/{version} was not found.");
-            }
-
-            entity.IsPublished = true;
-            cancellationToken.ThrowIfCancellationRequested();
-            await table.ExecuteAsync(TableOperation.Replace(entity));
         }
 
         private async IAsyncEnumerable<StoredEvent> ExecuteQuery(TableQuery<EventEntity> query,

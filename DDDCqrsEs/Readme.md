@@ -61,13 +61,17 @@ The challenge is complete when the events `StockCreated`, `StockUpdated`, and `S
 
 ### Challenge #2: Read path
 
-In Challenge #2, read data from projections to optimize reads.
+In Challenge #2, read data from projections to optimize reads. Complete it in two stages.
 
-Publish events related to the aggregate to the messaging system. The `DDDCqrsEs.WebJob` process should subscribe to Service Bus messages and update the projections. Complete the existing publisher and subscriber code. First verify that messages reach the queue, then complete the subscriber.
+First, publish each newly persisted aggregate event to Service Bus. Publish only the new event—not the historical events used to reconstitute the aggregate. Verify that the message reaches the queue.
+
+Next, complete the `DDDCqrsEs.WebJob` subscriber so that the received event is dispatched to the existing projection handlers and updates SQL.
 
 Hint: Create a queue named `StockEvents` in the Service Bus namespace.
 
 The challenge is complete when the stock appears in SQL.
+
+After it works, consider this failure: Table Storage accepts the event, but Service Bus is temporarily unavailable. The command fails after the write model has already changed, and the read model may never receive the event. Be prepared to explain why this is a dual-write problem and how a transactional outbox would address it. The participant template intentionally does not include the outbox solution.
 
 ### Challenge #3: Versioning and concurrency
 

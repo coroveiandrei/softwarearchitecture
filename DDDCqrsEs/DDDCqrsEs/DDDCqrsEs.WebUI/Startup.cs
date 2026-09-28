@@ -31,7 +31,6 @@ using DDDCqrsEs.Infrastructure.Services;
 using DDDCqrsEs.Application.Services;
 using DDDCqrsEs.Application.Models.AuthenticationModels;
 using DDDCqrsEs.Application.Queries.StockQueris;
-using DDDCqrsEs.WebUI.Services;
 
 namespace DDDCqrsEs.WebUI
 {
@@ -152,7 +151,6 @@ namespace DDDCqrsEs.WebUI
             services.RegisterApplicationServices();
             services.RegisterRepositories();
             services.RegisterWebAPIServices();
-            services.AddHostedService<EventOutboxBackgroundService>();
             services.AddCsp(nonceByteAmount: 32);
 
             services.AddIdentity<User, ApplicationRole>()

@@ -13,6 +13,5 @@ namespace DDDCqrsEs.Persistance.DataModel
         public DateTime TimeCreated { get; set; }
         public string EventType { get; set; }
         public string Data { get; set; }
-        public bool IsPublished { get; set; }
     }
 }

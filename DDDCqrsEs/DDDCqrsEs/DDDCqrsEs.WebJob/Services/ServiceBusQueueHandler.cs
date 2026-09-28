@@ -34,8 +34,7 @@ namespace DDDCqrsEs.WebJob.Services
             };
             var typedEvent = (BaseEvent)JsonConvert.DeserializeObject(messageBody, eventType);
 
-            await _mediator.Send(typedEvent);
-
+            // Challenge #2 dispatches the typed event so the projection handler can update SQL.
             Console.WriteLine($"Received {typedEvent.EventType} for stock with id {typedEvent.AggregateId}");
 
             await message.CompleteMessageAsync(message.Message);
