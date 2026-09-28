@@ -38,6 +38,7 @@ namespace CleanArc.Application.Commands.ToDoCommands
                 {
                     Id = newId,
                     Name = request.ToDo.Name,
+                    Description = request.ToDo.Description,
                     UserId = request.User.UserId,
                 };
 
@@ -45,7 +46,7 @@ namespace CleanArc.Application.Commands.ToDoCommands
                 await uow.SaveChangesAsync(cancellationToken);
             }
 
-            await _notificationService.NotifyAsync("New to do added");
+            await _notificationService.NotifyAsync("New to do added", cancellationToken);
 
             _logger.LogInformation("Finished Add task {0}", request.ToDo.Name);
             return new AddToDoCommandResponse
