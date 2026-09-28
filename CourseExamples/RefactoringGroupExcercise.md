@@ -47,7 +47,3 @@ Do not implement these requests during the exercise. Use them to decide which pa
 ## Time
 
 30 minutes
-
-## Source
-
-This exercise adapts the opening example from Martin Fowler's *Refactoring, Second Edition*. A maintained multilingual version is available in the [Theatrical Players Refactoring Kata](https://github.com/emilybache/Theatrical-Players-Refactoring-Kata).
