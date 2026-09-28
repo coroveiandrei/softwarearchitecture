@@ -26,14 +26,14 @@
 
 Inspect the solution structure and the dependencies between its projects. Trace where the `AddToDo` API call first enters the application and how it reaches the business logic and infrastructure code.
 
-## Challenge 1: Protect a bug fix with a regression test
+## Challenge 1: Make the failing regression test pass
 
-Users previously lost the description when they created a ToDo. The application test project contains a regression test for this behavior.
+Users cannot see the description after creating a ToDo. The application test project contains a failing regression test that describes the expected behavior.
 
-1. Run `dotnet test` and inspect `ToDoCommandHandlerTests`.
+1. Run `dotnet test` and confirm that `AddToDo_PersistsDescription` fails.
 2. Trace how the command model maps to the domain entity.
-3. Explain why the mapping belongs in the application use case.
-4. Add one more test for a related mapping or behavior that should not regress.
+3. Fix the production code without changing the regression test.
+4. Run the full test suite and confirm that all tests pass.
 
 ## Challenge 2: Review an outbound adapter
 

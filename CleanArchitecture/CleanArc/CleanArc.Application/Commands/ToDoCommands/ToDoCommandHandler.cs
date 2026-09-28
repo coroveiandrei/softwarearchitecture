@@ -38,7 +38,6 @@ namespace CleanArc.Application.Commands.ToDoCommands
                 {
                     Id = newId,
                     Name = request.ToDo.Name,
-                    Description = request.ToDo.Description,
                     UserId = request.User.UserId,
                 };
 
