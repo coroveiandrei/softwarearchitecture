@@ -22,16 +22,9 @@
 7. Use the login endpoint with user `admin` and password `P@ssw0rd`.
 8. Add a ToDo and list the user's ToDos to verify the environment.
 
-## Challenge 0: Map the architecture
+## Challenge 0: Inspect the solution
 
-Inspect the solution structure and project references.
-
-Create two diagrams:
-
-- A dependency diagram showing which projects reference other projects.
-- A request-flow diagram showing how `AddToDo` travels from the API controller to the application use case and persistence adapter.
-
-Explain the difference between runtime request flow and compile-time dependency direction. Identify the ports and adapters involved in the request.
+Inspect the solution structure and the dependencies between its projects. Trace where the `AddToDo` API call first enters the application and how it reaches the business logic and infrastructure code.
 
 ## Challenge 1: Protect a bug fix with a regression test
 
