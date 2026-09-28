@@ -1,10 +1,8 @@
-﻿using CleanArc.Common;
+using CleanArc.Common;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CleanArc.Application.Services
@@ -12,17 +10,17 @@ namespace CleanArc.Application.Services
     [MapServiceDependency(nameof(INotificationService))]
     public class NotificationService : INotificationService
     {
-        public async Task NotifyAsync(string message)
+        public async Task NotifyAsync(string message, CancellationToken cancellationToken = default)
         {
             var json = JsonConvert.SerializeObject(message);
-            var data = new StringContent(json, Encoding.UTF8, "application/json");
-
-            var url = "https://httpbin.org/post";
+            using var data = new StringContent(json, Encoding.UTF8, "application/json");
             using var client = new HttpClient();
+            using var response = await client.PostAsync(
+                "https://httpbin.org/post",
+                data,
+                cancellationToken);
 
-            var response = await client.PostAsync(url, data);
-
-            var result = await response.Content.ReadAsStringAsync();
+            response.EnsureSuccessStatusCode();
         }
     }
 }

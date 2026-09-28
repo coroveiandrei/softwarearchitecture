@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using CleanArc.Common;
 using CleanArc.Infrastructure.RequestBehaviours;

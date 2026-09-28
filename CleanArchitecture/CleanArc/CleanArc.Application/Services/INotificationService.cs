@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CleanArc.Application.Services
 {
-
     public interface INotificationService
     {
-        Task NotifyAsync(string message);
+        Task NotifyAsync(string message, CancellationToken cancellationToken = default);
     }
 }
