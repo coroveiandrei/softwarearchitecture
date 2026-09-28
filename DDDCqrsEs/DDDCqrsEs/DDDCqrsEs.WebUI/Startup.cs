@@ -120,7 +120,7 @@ namespace DDDCqrsEs.WebUI
 
 
             services.AddTransient<ITableStorageConnection, TableStorageConnection>(service => new TableStorageConnection(tableString));
-            services.AddTransient<IBaseEventPublisher, ServiceBusPublisher>(service => new ServiceBusPublisher(serviceBusString, "StockEvents"));
+            services.AddTransient<IBaseEventPublisher, ServiceBusPublisher>(service => new ServiceBusPublisher(serviceBusString, "stockevents"));
 
             services.AddLocalization();
 

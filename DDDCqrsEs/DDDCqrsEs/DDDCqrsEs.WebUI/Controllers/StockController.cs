@@ -7,7 +7,6 @@ using DDDCqrsEs.Application.Queries.StockQueris;
 using DDDCqrsEs.WebUI.Controllers.Base;
 using System;
 using System.Threading.Tasks;
-using DDDCqrsEs.Domain.Exceptions;
 
 namespace DDDCqrsEs.WebUI.Controllers
 {
@@ -30,10 +29,6 @@ namespace DDDCqrsEs.WebUI.Controllers
             {
                 return BadRequest(ex.Errors);
             }
-            catch (OptimisticConcurrencyException ex)
-            {
-                return Conflict(new { error = ex.Message });
-            }
         }
 
         [HttpPost("[action]")]
@@ -50,10 +45,6 @@ namespace DDDCqrsEs.WebUI.Controllers
             {
                 return BadRequest(ex.Errors);
             }
-            catch (OptimisticConcurrencyException ex)
-            {
-                return Conflict(new { error = ex.Message });
-            }
         }
 
         [HttpPost("[action]")]
@@ -69,10 +60,6 @@ namespace DDDCqrsEs.WebUI.Controllers
             catch (ValidationException ex)
             {
                 return BadRequest(ex.Errors);
-            }
-            catch (OptimisticConcurrencyException ex)
-            {
-                return Conflict(new { error = ex.Message });
             }
         }
 

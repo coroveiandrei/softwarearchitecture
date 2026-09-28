@@ -12,6 +12,6 @@ namespace DDDCqrsEs.Domain.Repositories
         public StockProjection GetStockByLicensePlate(string licensePlate);
         public void CreateStock(StockProjection stock);
         public void UpdateStock(Guid id, StockModel model, int version);
-        public void DeleteStock(Guid id, int version);
+        public void DeleteStock(Guid id);
     }
 }

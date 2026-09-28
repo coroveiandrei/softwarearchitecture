@@ -34,7 +34,7 @@ namespace DDDCqrsEs.Application.EventHandlers
 
         public Task Handle(StockDeleted request, CancellationToken token)
         {
-            _stockProjectionRepository.DeleteStock(request.AggregateId, request.Version);
+            _stockProjectionRepository.DeleteStock(request.AggregateId);
             return Unit.Task;
         }
     }

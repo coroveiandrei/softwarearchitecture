@@ -4,7 +4,6 @@ using DDDCqrsEs.Domain.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using DDDCqrsEs.Domain.Exceptions;
 
 namespace DDDCqrsEs.Application.Commands.StockCommands
 {
@@ -48,7 +47,6 @@ namespace DDDCqrsEs.Application.Commands.StockCommands
             _stockProjectionRepository = stockProjectionRepository;
             RuleFor(x => x.BestBeforeDate).Must(IsNotInPast).WithMessage("You cannot enter a date from the past.");
             RuleFor(x => x).Must(BeUnique).WithMessage("License plate already exists in database.");
-            RuleFor(x => x).Must(HasNotChangedSince).WithMessage(OptimisticConcurrencyException.DefaultMessage);
         }
          
         private bool BeUnique(UpdateStockCommand command)
@@ -74,7 +72,10 @@ namespace DDDCqrsEs.Application.Commands.StockCommands
         public bool HasNotChangedSince(UpdateStockCommand command)
         {
             var stockFromDb = _stockProjectionRepository.GetStockById(command.Id);
-            return stockFromDb != null && stockFromDb.Version == command.Version;
+            if (stockFromDb.Version == command.Version) {
+                return true;
+            }
+            return false;
         }
     }
     public class DeleteStockCommandValidator : AbstractValidator<DeleteStockCommand>
@@ -84,13 +85,16 @@ namespace DDDCqrsEs.Application.Commands.StockCommands
         public DeleteStockCommandValidator(IStockProjectionRepository stockProjectionRepository)
         {
             _stockProjectionRepository = stockProjectionRepository;
-            RuleFor(x => x).Must(HasNotChangedSince).WithMessage(OptimisticConcurrencyException.DefaultMessage);
         }
 
         public bool HasNotChangedSince(DeleteStockCommand command)
         {
             var stockFromDb = _stockProjectionRepository.GetStockById(command.Id);
-            return stockFromDb != null && stockFromDb.Version == command.Version;
+            if (stockFromDb.Version == command.Version)
+            {
+                return true;
+            }
+            return false;
         }
     }
 
