@@ -6,10 +6,7 @@ A company of theatrical players performs plays at customer events. It calculates
 
 The current implementation supports tragedies and comedies. The billing calculation and plain-text formatting live in one `statement` function.
 
-Starter files:
-
-- [`statement.js`](RefactoringGroupExercise/statement.js)
-- [`statement.test.js`](RefactoringGroupExercise/statement.test.js)
+Starter implementation: [`statement.js`](RefactoringGroupExercise/statement.js)
 
 The current output is:
 
@@ -33,16 +30,8 @@ Do not implement these requests during the exercise. Use them to decide which pa
 
 ## Assignment
 
-1. Run the characterization tests:
-
-   ```powershell
-   cd CourseExamples\RefactoringGroupExercise
-   npm test
-   ```
-
-2. List two or three reasons why the `statement` function may need to change.
-3. Refactor the implementation while keeping all characterization tests passing.
-4. Sketch the resulting functions, classes, or modules and explain how the design accommodates the two future changes.
+1. List two or three reasons why the `statement` function may need to change.
+2. Sketch the resulting functions, classes, or modules and explain how the design accommodates the two future changes.
 
 ## Time
 
