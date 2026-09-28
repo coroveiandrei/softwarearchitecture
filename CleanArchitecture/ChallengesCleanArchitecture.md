@@ -35,18 +35,17 @@ Users cannot see the description after creating a ToDo. The application test pro
 3. Fix the production code without changing the regression test.
 4. Run the full test suite and confirm that all tests pass.
 
-## Challenge 2: Review an outbound adapter
+## Challenge 2: Move the outbound adapter to the correct layer
 
-Users receive a notification when they add a ToDo. Review how the application reaches the webhook through `INotificationService`.
+Users receive a webhook notification when they add a ToDo. The architecture test `ApplicationLayer_DoesNotContainNotificationAdapters` fails because the concrete HTTP implementation is in the Application project.
 
-Verify that:
+1. Run the architecture test and inspect the reported violating type.
+2. Keep `INotificationService` in the Application project because it defines the port required by the use case.
+3. Move the concrete HTTP implementation to the Infrastructure project.
+4. Register the adapter in the composition root without adding an Application-to-Infrastructure dependency.
+5. Run the full test suite and confirm that the architecture test passes.
 
-- The Application project owns the notification interface.
-- The Infrastructure project owns the HTTP implementation.
-- The composition root supplies the webhook URL and registers the adapter.
-- The application use case can be tested without making an HTTP call.
-
-Discuss what should happen when persistence succeeds but notification delivery fails. Document the policy your team recommends. As an extension, use the existing `ToDoAdded` event to separate notification delivery from the command handler.
+As an extension, replace the directly constructed `HttpClient` with an injected client and move the webhook URL into configuration. Discuss what should happen when persistence succeeds but notification delivery fails.
 
 ## Challenge 3: Group architecture decision
 

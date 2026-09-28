@@ -139,7 +139,7 @@ namespace CleanArc.WebUI
 
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));
             services.AddValidatorsFromAssembly(typeof(AddToDoCommandValidator).Assembly);
-            services.RegisterInfrastructureComponents(Configuration);
+            services.RegisterInfrastructureComponents();
             services.RegisterApplicationServices();
             services.RegisterRepositories();
             services.RegisterWebAPIServices();
