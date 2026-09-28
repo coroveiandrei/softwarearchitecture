@@ -53,9 +53,10 @@ Work in groups of three or four. A manager believes that Azure SQL is too expens
 
 Treat the proposal as a hypothesis. Prepare a short architecture decision record that covers:
 
-- The data and access patterns that would move. State whether ASP.NET Identity data remains in SQL.
-- A partition-key and row-key strategy for ToDos.
-- Changes required in each project and any abstractions that currently assume Entity Framework or relational transactions.
+- The classes, interfaces, and projects that would need to change.
+- For each affected class, whether the team would modify it, replace it, or introduce a new implementation.
+- Any abstractions that currently assume Entity Framework or relational transactions.
+- The classes and projects that should remain unchanged, with a brief explanation.
 - Your recommendation and a rough implementation estimate.
 
 Each group has 20 minutes to prepare and 5 minutes to present. Other groups should challenge one assumption or trade-off in the proposal.
