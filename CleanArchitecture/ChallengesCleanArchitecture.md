@@ -37,7 +37,7 @@ Users cannot see the description after creating a ToDo. The application test pro
 
 ## Challenge 2: Move the outbound adapter to the correct layer
 
-Users receive a webhook notification when they add a ToDo. The architecture test `ApplicationLayer_DoesNotContainNotificationAdapters` fails because the concrete HTTP implementation is in the Application project.
+Users receive a webhook notification when they add a ToDo. The generic architecture test `ApplicationLayer_DoesNotImplementItsOutboundPorts` fails because the Application project contains a concrete implementation of one of its own outbound ports.
 
 1. Run the architecture test and inspect the reported violating type.
 2. Keep `INotificationService` in the Application project because it defines the port required by the use case.
