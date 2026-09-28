@@ -56,8 +56,6 @@ Treat the proposal as a hypothesis. Prepare a short architecture decision record
 - The data and access patterns that would move. State whether ASP.NET Identity data remains in SQL.
 - A partition-key and row-key strategy for ToDos.
 - Changes required in each project and any abstractions that currently assume Entity Framework or relational transactions.
-- Differences in queries, consistency, transactions, migration, rollback, security, and operations.
-- The evidence needed to compare cost and performance.
 - Your recommendation and a rough implementation estimate.
 
-Each group has 30 minutes to prepare and 5 minutes to present. Other groups should challenge one assumption or trade-off in the proposal.
+Each group has 20 minutes to prepare and 5 minutes to present. Other groups should challenge one assumption or trade-off in the proposal.
