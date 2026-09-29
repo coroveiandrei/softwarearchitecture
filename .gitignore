@@ -351,5 +351,6 @@ healthchecksdb
 /Microservices/src/PlacementService/.vs
 /Microservices/src/InventoryService/.vs
 /DDDCqrsEs/DDDCqrsEs/.vs
+/infracode/config/DDDInfrastructureparams.json
 /CleanArchitecture/CleanArc/.vs/CleanArc/DesignTimeBuild/.dtbcache.v2
 /CleanArchitecture/CleanArc/.vs

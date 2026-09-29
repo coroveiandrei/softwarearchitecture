@@ -4,6 +4,8 @@ using Newtonsoft.Json;
 using DDDCqrsEs.Domain.Events;
 using System;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using System.Threading;
 
 namespace DDDCqrsEs.WebJob.Services
 {
@@ -23,23 +25,26 @@ namespace DDDCqrsEs.WebJob.Services
         public async Task HandleMessage(ProcessMessageEventArgs message)
         {
             var messageBody = message.Message.Body.ToString();
-            var _event = JsonConvert.DeserializeObject<BaseEvent>(messageBody);
+            var eventTypeName = JObject.Parse(messageBody).Value<string>(nameof(BaseEvent.EventType));
+            var eventType = eventTypeName switch
+            {
+                nameof(StockCreated) => typeof(StockCreated),
+                nameof(StockUpdated) => typeof(StockUpdated),
+                nameof(StockDeleted) => typeof(StockDeleted),
+                _ => throw new JsonSerializationException($"Unknown event type '{eventTypeName}'.")
+            };
+            var typedEvent = (BaseEvent)JsonConvert.DeserializeObject(messageBody, eventType);
 
-            var assembly = typeof(BaseEvent).Assembly;
-            var _namespace = typeof(BaseEvent).Namespace;
-            var fullClassName = _namespace + "." + _event.EventType;
-            var eventType = assembly.GetType(fullClassName);
-            dynamic typedEvent = Activator.CreateInstance(eventType);
+            await DispatchEvent(typedEvent);
 
-            typedEvent.Stock = _event.Stock;
-            typedEvent.AggregateId = _event.AggregateId;
-            typedEvent.Version = _event.Version;
-
-            await _mediator.Send(typedEvent);
-
-            Console.WriteLine($"Received {_event.EventType} for stock with id {_event.AggregateId}");
+            Console.WriteLine($"Received {typedEvent.EventType} for stock with id {typedEvent.AggregateId}");
 
             await message.CompleteMessageAsync(message.Message);
+        }
+
+        internal Task DispatchEvent(BaseEvent domainEvent, CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
         }
 
         public async Task HandleError(ProcessErrorEventArgs message)

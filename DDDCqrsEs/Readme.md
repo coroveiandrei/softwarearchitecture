@@ -1,72 +1,89 @@
 # DDD CQRS Event Sourcing Architecture Challenges
 
-### Map & start the solution:
-1. Deploy DDDInfrastructure.bicep using config\DDDInfrastructure.json as config. The template contains Table storage for Event Sourcing Persistence; SQL  Server and DB for Read models, and a Service Bus resource.
-In the file DDDInfrastructure.json, change all [CHANGEME] with appropriate values. Then, use the following command to create the resources:
+### Map and start the solution
 
-_az deployment group create --resource-group  [CHANGEME] --template-file DDDInfrastructure.bicep --parameters .\config\DDDInfrastructureparams.json_
+1. From `infracode`, create a local parameter file that Git will ignore:
 
-2. Record connection strings:
-- Storage account: You can find your storage account's connection strings in the Azure portal. Navigate to Security + networking > Access keys in your storage account's settings to see connection strings for  the primary key.
-- SQL Server: the connection string should be like this (all the options can be found in DDDInfrastructure.json)
-Server=tcp:[REPLACE_ME_WITH_SERVERNAME].database.windows.net,1433;Database=[REPLACE_ME_WITH_DATABASENAME];User ID=[REPLACE_ME_WITH_USERNAME];Password=[REPLACE_ME_WITH_PASSWORD];Trusted_Connection=False;Encrypt=True;
-- Service bus: to record the connection string, navigate to the Service Bus resource in Azure Portal, open up Shared Access Policies, and click on RootManageSharedAccessKey. Then record PrimaryConnectionString.
+   ```powershell
+   Copy-Item .\config\DDDInfrastructureparams.example.json .\config\DDDInfrastructureparams.json
+   ```
 
-3. Navigate to Azure SQL Server resource and add your IP address as exception to the firewall
-4. Now open up DDDCQRSES project from the root of the git folder. Complete in DDDCQRSES.WEBUI\appsettings.json the connection strings recorded at point 2. Do the same for DDDCQRSEs.WebJob\appsettings.json
-5. Open up terminal and run *dotnet build*
-6. In the current terminal
-- make sure you are in DDDCQRSEs.WebUI folder
-- run dotnet run
-(this will start the Web project.)
-7. Since there is no UI, navigate to https://localhost:[port]/*/swagger*
+2. Replace the `CHANGE_ME` values in the local parameter file, then deploy the resources:
+
+   ```powershell
+   az deployment group create --resource-group [CHANGEME] --template-file .\DDDInfrastructure.bicep --parameters .\config\DDDInfrastructureparams.json
+   ```
+
+3. Create a least-privilege Service Bus shared-access policy for the exercise. Do not use `RootManageSharedAccessKey` in application configuration.
+4. Set the required connection strings as environment variables in each terminal used to start the Web UI or WebJob:
+
+   ```powershell
+   $env:ConnectionStrings__TableConnectionString = "[TABLE_STORAGE_CONNECTION_STRING]"
+   $env:ConnectionStrings__ServiceBusString = "[SERVICE_BUS_CONNECTION_STRING]"
+   $env:ConnectionStrings__ToDoDatabase = "[SQL_CONNECTION_STRING]"
+   ```
+
+   Keep real values out of `appsettings.json`, screenshots, and commits.
+
+5. Add your IP address to the Azure SQL firewall rules.
+6. Open the `DDDCqrsEs` solution and run `dotnet build`.
+7. In the current terminal:
+   - Make sure you are in the `DDDCqrsEs.WebUI` folder.
+   - Run `dotnet run`.
+8. Navigate to `https://localhost:[port]/swagger`.
 
 Login with:
-user: admin
-password: P@ssw0rd
 
-### Challenge #0: Project structure & dependencies
+- User: `admin`
+- Password: `P@ssw0rd`
+
+### Challenge #0: Project structure and dependencies
 
 Inspect the overall project structure:
-* What are the projects composing the solution? 
-* What are the links between them?
-* Can you spot the resemblance of clean architecture?
 
-Inspect the overall sequence diagram and try to figure out the scope of having 2 entry points projects: WebUI and WebJob
+- What projects compose the solution?
+- What are the links between them?
+- Can you spot the resemblance to Clean Architecture?
+
+Inspect the overall sequence diagram and determine why the solution has two entry-point projects: WebUI and WebJob.
 
 ![image](https://github.com/coroveiandrei/trainingsoftarchforcloud/assets/37452422/f502d235-16cf-48af-8917-fc170f909227)
 
 ### Challenge #1: Write path
-In the first challenge, we will create the writing path. A new event will be generated and stored in the Event Store (Table Storage) whenever there is a web request.
-There is  already some code in place.  Can you localize and complete it?
 
-Hint: Create a table called EventStore in TableStorage that will serve as a persistence mechanism.
+In the first challenge, create the writing path. A new event should be generated and stored in the Event Store in Table Storage whenever there is a web request.
 
-The challenge is complete when the events StockAdded, StockEdited, and StockDeleted are visible in EventStore.
+Some code is already in place. Locate and complete it.
+
+Hint: Create a table called `EventStore` in Table Storage to serve as the persistence mechanism.
+
+The challenge is complete when the events `StockCreated`, `StockUpdated`, and `StockDeleted` are visible in `EventStore`.
 
 ### Challenge #2: Read path
-In challenge #2, in order to optimize reads, we will read data from projections. 
-In order to accomplish this task, we need to publish any events related to the aggregate onto a messaging system. Afterward, a background process (in this case, DDDCQRS.Webjob) should subscribe to messages from the Service Bus and update the projections accordingly. Though some code is already present, you will need to complete the missing parts to make sure it's done properly. As the initial step, focus on making the publisher work and verify that the messages are queued in the Service Bus. Once that is achieved, can you address the subscriber portion?
 
-Hint: Create a queue named StockEvents in the service bus namespace.
+In Challenge #2, read data from projections to optimize reads. Complete it in two stages.
 
-The challenge is complete when you see the stock populated in SQL.
+First, publish each newly persisted aggregate event to Service Bus. Publish only the new event—not the historical events used to reconstitute the aggregate. Verify that the message reaches the queue.
 
-### Challenge #3: Versioning & Concurrency
-In CQRS, since there exists a write and a read model, the synchronization between them takes time (we often call this delta t). In order not to have discrepancies, code needs to be put in place to handle potential lost updates. 
-For example, both Alice and Bob may have version 1 of stock. Then, they both update the version at the same time. One of the users should succeed, while the other should get "Data was changed by another user."
+Next, complete the `DDDCqrsEs.WebJob` subscriber so that the received event is dispatched to the existing projection handlers and updates SQL.
+
+Hint: Create a queue named `StockEvents` in the Service Bus namespace.
+
+The challenge is complete when the stock appears in SQL.
+
+After it works, consider this failure: Table Storage accepts the event, but Service Bus is temporarily unavailable. The command fails after the write model has already changed, and the read model may never receive the event. What consistency problem does this create, and how could the design guarantee that the event is eventually published without undoing the persisted write?
+
+### Challenge #3: Versioning and concurrency
+
+CQRS uses separate write and read models, so synchronization takes time. The application must handle potential lost updates.
+
+For example, Alice and Bob may both have version 1 of a stock item and update it at the same time. One update should succeed while the other receives "Data was changed by another user."
 
 ![image](https://github.com/coroveiandrei/trainingsoftarchforcloud/assets/37452422/4f353a94-3213-4237-b8f1-854eba9da467)
 
-There are two places where this check is done:
-1. In the command validator - we should check that the version from the projection matches the latest version from the aggregate. If not, data was changed in the meantime.
-2. In the Event Store itself, while saving, we get an error if duplicate keys are inserted. If we use the version as the row key and aggregateId as partition key this should do the trick.
+The solution checks this in two places:
 
-Versioning is already in place; your challenge is to implement the "data was changed by another user" validation.
+1. The command validator checks whether the projection version matches the latest aggregate version.
+2. The Event Store rejects duplicate keys. Using the version as the row key and aggregate ID as the partition key provides the concurrency check.
 
-
-
-
-
-
-
+Versioning is already in place. Implement the "data was changed by another user" validation.

@@ -1,73 +1,76 @@
-﻿using DDDCqrsEs.Domain.Events;
+using DDDCqrsEs.Common;
+using DDDCqrsEs.Domain.Events;
+using DDDCqrsEs.Domain.Models;
+using DDDCqrsEs.Domain.Repositories;
+using DDDCqrsEs.Persistance.DataModel;
+using Microsoft.WindowsAzure.Storage.Table;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using DDDCqrsEs.Domain.Repositories;
-using DDDCqrsEs.Common;
-using Newtonsoft.Json;
-using DDDCqrsEs.Persistance.DataModel;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Table;
+using System.Runtime.CompilerServices;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DDDCqrsEs.Persistance.Repositories
 {
     [MapServiceDependency(Name: nameof(EventStore))]
-
     public class EventStore : IEventStore
     {
+        private readonly ITableStorageConnection _connectionCreator;
 
-        private readonly ITableStorageConnection _connectionCreator; 
+        public EventStore(ITableStorageConnection connection) => _connectionCreator = connection;
 
-        public EventStore(ITableStorageConnection connection)
+        public async Task SaveEvent(BaseEvent domainEvent, CancellationToken cancellationToken = default)
         {
-            _connectionCreator = connection;
-        }
-
-        public async Task SaveEvent(BaseEvent _event)
-        {
-            string data = JsonConvert.SerializeObject(_event.Stock);
-
-            EventEntity eventEnity = new EventEntity(_event.AggregateId, _event.Version)
+            var entity = new EventEntity(domainEvent.AggregateId, domainEvent.Version)
             {
-                EventType = _event.EventType,
-                Data = data,
-                TimeCreated =_event.TimeStamp
+                EventType = domainEvent.EventType,
+                Data = JsonConvert.SerializeObject(domainEvent.Stock),
+                TimeCreated = domainEvent.TimeStamp
             };
 
-            var cloudTable = await _connectionCreator.CreateConnection(nameof(EventStore));
-            var insertOperation = TableOperation.Insert(eventEnity);
-
-            await cloudTable.ExecuteAsync(insertOperation);
-            
+            var table = await _connectionCreator.CreateConnection(nameof(EventStore));
+            cancellationToken.ThrowIfCancellationRequested();
+            await table.ExecuteAsync(TableOperation.Insert(entity));
         }
 
-        public async IAsyncEnumerable<EventEntity> GetAllEvents()
+        public async IAsyncEnumerable<StoredEvent> GetEventsByAggregateId(Guid id,
+            [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
-            var cloudTable = await _connectionCreator.CreateConnection(nameof(EventStore));
-
-            var query = new TableQuery<EventEntity>();
-
-            var result = cloudTable.ExecuteQuerySegmentedAsync(query, null);
-            foreach (var item in result.Result)
-            {
-                yield return item;
-            }
-        }
-
-        public async IAsyncEnumerable<EventEntity> GetEventsByAggregateId(Guid id)
-        {
-            var cloudTable = await _connectionCreator.CreateConnection(nameof(EventStore));
-
             var filter = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, id.ToString());
             var query = new TableQuery<EventEntity>().Where(filter);
 
-            var result = cloudTable.ExecuteQuerySegmentedAsync(query, null);
-            foreach (var item in result.Result)
+            await foreach (var storedEvent in ExecuteQuery(query, cancellationToken))
             {
-                yield return item;
+                yield return storedEvent;
             }
         }
 
+        private async IAsyncEnumerable<StoredEvent> ExecuteQuery(TableQuery<EventEntity> query,
+            [EnumeratorCancellation] CancellationToken cancellationToken)
+        {
+            var table = await _connectionCreator.CreateConnection(nameof(EventStore));
+            TableContinuationToken continuationToken = null;
+            var storedEvents = new List<StoredEvent>();
+
+            do
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var segment = await table.ExecuteQuerySegmentedAsync(query, continuationToken);
+                continuationToken = segment.ContinuationToken;
+                foreach (var entity in segment.Results)
+                {
+                    storedEvents.Add(new StoredEvent(Guid.Parse(entity.PartitionKey), int.Parse(entity.RowKey),
+                        entity.EventType, entity.Data, entity.TimeCreated));
+                }
+            }
+            while (continuationToken != null);
+
+            foreach (var storedEvent in storedEvents.OrderBy(item => item.Version))
+            {
+                yield return storedEvent;
+            }
+        }
     }
 }

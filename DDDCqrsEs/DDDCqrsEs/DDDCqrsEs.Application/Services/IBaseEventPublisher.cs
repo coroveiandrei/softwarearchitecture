@@ -3,11 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace DDDCqrsEs.Application.Services
 {
     public interface IBaseEventPublisher
     {
-        public Task PublishEvent(BaseEvent _event);
+        Task PublishEvent(BaseEvent domainEvent, CancellationToken cancellationToken = default);
     }
 }
