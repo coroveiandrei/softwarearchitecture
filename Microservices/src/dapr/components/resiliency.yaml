@@ -2,14 +2,26 @@ apiVersion: dapr.io/v1alpha1
 kind: Resiliency
 metadata:
   name: myresiliency
+scopes:
+  - inventoryservice
+  - taskmanagementservice
 spec:
   policies:
     retries:
+      placementServiceRetry:
+        policy: constant
+        duration: 200ms
+        maxRetries: 5
+        matching:
+          httpStatusCodes: "500-599"
       pubsubRetry:
         policy: constant
-        duration: 5s
-        maxRetries: 10
+        duration: 500ms
+        maxRetries: 5
   targets:
+    apps:
+      stockplacementservice:
+        retry: placementServiceRetry
     components:
       pubsub:
         inbound:

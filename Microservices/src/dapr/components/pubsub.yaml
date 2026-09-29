@@ -10,15 +10,19 @@ spec:
   - name: host
     value: "amqp://localhost:5672"
   - name: durable
-    value: "false"
+    value: "true"
   - name: deletedWhenUnused
     value: "false"
   - name: autoAck
     value: "false"
   - name: reconnectWait
     value: "0"
-  - name: concurrency
+  - name: concurrencyMode
     value: parallel
+  - name: deliveryMode
+    value: "2"
+  - name: enableDeadLetter
+    value: "true"
 scopes:
   - stockplacementservice
   - taskmanagementservice

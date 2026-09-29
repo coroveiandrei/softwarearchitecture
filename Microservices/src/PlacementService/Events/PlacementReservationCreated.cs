@@ -1,4 +1,4 @@
 ﻿namespace PlacementService.Events
 {
-    public record struct PlacementReservationCreated(string ObjectId, string Location);
+    public record struct PlacementReservationCreated(Guid EventId, string ObjectId, string Location);
 }

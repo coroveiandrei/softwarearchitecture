@@ -7,36 +7,3 @@ spec:
     samplingRate: "1"
     zipkin:
       endpointAddress: "http://localhost:9411/api/v2/spans"
-
-  # Explicit name resolution configuration for Consul
-  nameResolution:
-    component: "consul"
-    configuration:
-      selfRegister: true
-      client:
-        address: "localhost:8500"
-        scheme: "http"
-
-  # Consul-based service discovery
-  features:
-    - name: service.discovery.useMdns
-      enabled: false          # disable mDNS
-    - name: service.discovery.consul
-      enabled: true
-      metadata:
-        host: "localhost:8500"   # Consul agent address
-        scheme: "http"
-
-  resiliency:
-    policies:
-      retries:
-        myRetryPolicy:
-          maxRetries: 5
-          backoff:
-            duration: 100ms
-            maxDuration: 5s
-            factor: 2
-    targets:
-      - name: taskmanagementservice
-        retries:
-          policy: myRetryPolicy

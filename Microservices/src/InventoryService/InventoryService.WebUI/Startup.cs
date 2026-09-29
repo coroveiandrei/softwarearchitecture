@@ -24,8 +24,6 @@ using InventoryService.Application.Commands.StockCommands;
 using InventoryService.Application.RemoteServices;
 using InventoryService.Infrastructure.RemoteServices;
 using Dapr.Client;
-using Polly.Extensions.Http;
-using Polly;
 using System.Net.Http;
 
 namespace InventoryService.WebUI
