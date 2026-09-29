@@ -191,7 +191,10 @@ namespace InventoryService.WebUI
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseHttpsRedirection();
+            if (!env.IsDevelopment())
+            {
+                app.UseHttpsRedirection();
+            }
             app.UseStaticFiles();
             if (!env.IsDevelopment())
             {

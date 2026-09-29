@@ -48,6 +48,12 @@ builder.Services.AddLocalization();
 builder.Logging.AddApplicationInsights();
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ToDoDbContext>();
+    dbContext.Database.Migrate();
+}
+
 // configure web-app
 if (app.Environment.IsDevelopment())
 {
