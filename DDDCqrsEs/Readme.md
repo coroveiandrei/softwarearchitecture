@@ -2,16 +2,13 @@
 
 ### Map and start the solution
 
-1. From `infracode`, create a local parameter file that Git will ignore:
+1. From `infracode`, copy `config/DDDInfrastructureparams.example.json` to `config/DDDInfrastructureparams.json` and replace the example resource names. Create a local ARM parameters file at `config/sql-password.local.json` with a `sqlAdministratorPassword` parameter. Git ignores both local files.
+
+2. Reuse existing SQL, Table Storage, and Service Bus resources if they are available. Otherwise, replace `arc` with your exercise resource group, preview the deployment, and create the resources:
 
    ```powershell
-   Copy-Item .\config\DDDInfrastructureparams.example.json .\config\DDDInfrastructureparams.json
-   ```
-
-2. Replace the `CHANGE_ME` values in the local parameter file, then deploy the resources:
-
-   ```powershell
-   az deployment group create --resource-group [CHANGEME] --template-file .\DDDInfrastructure.bicep --parameters .\config\DDDInfrastructureparams.json
+   az deployment group what-if --resource-group arc --template-file .\DDDInfrastructure.bicep --parameters .\config\DDDInfrastructureparams.json .\config\sql-password.local.json
+   az deployment group create --resource-group arc --template-file .\DDDInfrastructure.bicep --parameters .\config\DDDInfrastructureparams.json .\config\sql-password.local.json
    ```
 
 3. Create a least-privilege Service Bus shared-access policy for the exercise. Do not use `RootManageSharedAccessKey` in application configuration.

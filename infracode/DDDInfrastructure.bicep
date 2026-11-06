@@ -2,6 +2,9 @@ param location string = resourceGroup().location
 
 param sqlServers array 
 
+@secure()
+param sqlAdministratorPassword string
+
 param storageAccounts array 
 
 param serviceBuses array 
@@ -20,7 +23,7 @@ module databaseServerModule 'modules/sqlDatabase.bicep' = [ for sqlServerInstanc
     databaseServerName: sqlServerInstance.name
     databaseName:  sqlServerInstance.database
     username: sqlServerInstance.username
-    password: sqlServerInstance.password
+    password: sqlAdministratorPassword
   }
 }]
 

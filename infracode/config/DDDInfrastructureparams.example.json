@@ -6,13 +6,16 @@
       "value": [
         {
           "name": "changemestorageaccount",
+          "tables": ["EventStore"],
+          "blobs": [],
           "kind": "StorageV2",
           "sku": {
             "name": "Standard_LRS",
             "tier": "Standard"
           },
           "properties": {
-            "publicNetworkAccess": "Enabled"
+            "publicNetworkAccess": "Enabled",
+            "networkAcls": {}
           }
         }
       ]
@@ -23,7 +26,6 @@
           "name": "change-me-sql-server",
           "database": "change-me-database",
           "username": "change-me-admin",
-          "password": "CHANGE_ME",
           "publicNetworkAccess": "Enabled"
         }
       ]
