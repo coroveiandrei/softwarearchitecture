@@ -1,5 +1,5 @@
 using System;
-using System.Threading;
+using System.Collections.Concurrent;
 
 namespace PlacementService.FailureSimulation;
 
@@ -8,12 +8,13 @@ public sealed class ReservationFailureSimulator
     public const string EnvironmentVariable = "PLACEMENT_FAILURE_COUNT";
 
     private readonly bool _alwaysFail;
-    private int _remainingFailures;
+    private readonly int _failureCount;
+    private readonly ConcurrentDictionary<string, int> _remainingFailures = new();
 
     public ReservationFailureSimulator(int failureCount)
     {
         _alwaysFail = failureCount < 0;
-        _remainingFailures = Math.Max(0, failureCount);
+        _failureCount = Math.Max(0, failureCount);
     }
 
     public static ReservationFailureSimulator FromEnvironment()
@@ -23,25 +24,27 @@ public sealed class ReservationFailureSimulator
             int.TryParse(configuredValue, out var failureCount) ? failureCount : 0);
     }
 
-    public bool ShouldFail()
+    public bool ShouldFail(string objectId)
     {
         if (_alwaysFail)
         {
             return true;
         }
 
+        if (_failureCount == 0)
+        {
+            return false;
+        }
+
         while (true)
         {
-            var currentValue = Volatile.Read(ref _remainingFailures);
+            var currentValue = _remainingFailures.GetOrAdd(objectId, _failureCount);
             if (currentValue == 0)
             {
                 return false;
             }
 
-            if (Interlocked.CompareExchange(
-                    ref _remainingFailures,
-                    currentValue - 1,
-                    currentValue) == currentValue)
+            if (_remainingFailures.TryUpdate(objectId, currentValue - 1, currentValue))
             {
                 return true;
             }

@@ -1,5 +1,5 @@
 $ErrorActionPreference = "Stop"
-Push-Location (Join-Path $PSScriptRoot "Microservices/src/TaskManagement/TaskManagement.WebUI")
+Push-Location (Join-Path $PSScriptRoot "src/TaskManagement/TaskManagement.WebUI")
 try {
     dapr run `
         --app-id taskmanagementservice `

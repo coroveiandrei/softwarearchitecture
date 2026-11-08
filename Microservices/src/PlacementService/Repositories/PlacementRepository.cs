@@ -33,6 +33,21 @@ public class PlacementRepository : IPlacemementRepository
         return result;
     }
 
+    public async Task<Dictionary<string, string>> GetReservedLocations()
+    {
+        var reservations = await _daprClient.GetBulkStateAsync<string>(
+            DAPR_STORE_NAME, AllLocations, parallelism: 10);
+        var locations = new Dictionary<string, string>();
+        foreach (var reservation in reservations)
+        {
+            if (!string.IsNullOrEmpty(reservation.Value))
+            {
+                locations.TryAdd(reservation.Value, reservation.Key);
+            }
+        }
+        return locations;
+    }
+
     public async Task SavePlacementPosition(string location, string objectId)
     {
         await _daprClient.SaveStateAsync(

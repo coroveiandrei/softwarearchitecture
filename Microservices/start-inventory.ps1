@@ -1,5 +1,5 @@
 $ErrorActionPreference = "Stop"
-Push-Location (Join-Path $PSScriptRoot "Microservices/src/InventoryService/InventoryService.WebUI")
+Push-Location (Join-Path $PSScriptRoot "src/InventoryService/InventoryService.WebUI")
 try {
     dapr run `
         --app-id inventoryservice `

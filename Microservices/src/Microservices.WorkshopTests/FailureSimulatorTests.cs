@@ -12,10 +12,40 @@ public class FailureSimulatorTests
     {
         var simulator = new ReservationFailureSimulator(2);
 
-        Assert.True(simulator.ShouldFail());
-        Assert.True(simulator.ShouldFail());
-        Assert.False(simulator.ShouldFail());
-        Assert.False(simulator.ShouldFail());
+        Assert.True(simulator.ShouldFail("stock-1"));
+        Assert.True(simulator.ShouldFail("stock-1"));
+        Assert.False(simulator.ShouldFail("stock-1"));
+        Assert.False(simulator.ShouldFail("stock-1"));
+    }
+
+    [Fact]
+    public void ReservationFailuresAreIndependentForEachStock()
+    {
+        var simulator = new ReservationFailureSimulator(2);
+
+        Assert.True(simulator.ShouldFail("stock-1"));
+        Assert.True(simulator.ShouldFail("stock-2"));
+        Assert.True(simulator.ShouldFail("stock-1"));
+        Assert.False(simulator.ShouldFail("stock-1"));
+        Assert.True(simulator.ShouldFail("stock-2"));
+        Assert.False(simulator.ShouldFail("stock-2"));
+    }
+
+    [Fact]
+    public void ConcurrentReservationAttemptsFailExactlyTheConfiguredNumberOfTimes()
+    {
+        var simulator = new ReservationFailureSimulator(2);
+        var failures = 0;
+
+        Parallel.For(0, 20, _ =>
+        {
+            if (simulator.ShouldFail("stock-1"))
+            {
+                Interlocked.Increment(ref failures);
+            }
+        });
+
+        Assert.Equal(2, failures);
     }
 
     [Fact]
@@ -35,8 +65,8 @@ public class FailureSimulatorTests
         var reservationSimulator = new ReservationFailureSimulator(-1);
         var eventSimulator = new PlacementEventFailureSimulator(-1);
 
-        Assert.True(reservationSimulator.ShouldFail());
-        Assert.True(reservationSimulator.ShouldFail());
+        Assert.True(reservationSimulator.ShouldFail("stock-1"));
+        Assert.True(reservationSimulator.ShouldFail("stock-1"));
         Assert.True(eventSimulator.ShouldFail());
         Assert.True(eventSimulator.ShouldFail());
     }

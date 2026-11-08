@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using InventoryService.Application.RemoteServices;
 using Newtonsoft.Json;
 using InventoryService.Application.Common;
 using InventoryService.Domain.Aggregates;
@@ -19,14 +20,21 @@ namespace InventoryService.Application.Queries.StockQueris
     {
 
         private readonly IStockProjectionRepository _stocksRepository;
-        public StockQueriesHandler(IStockProjectionRepository stocksRepository)
+        private readonly IPlacementService _placementService;
+        public StockQueriesHandler(IStockProjectionRepository stocksRepository, IPlacementService placementService)
         {
             _stocksRepository = stocksRepository;
+            _placementService = placementService;
         }
 
         public async Task<GetStockByIdQueryResponse> Handle(GetStockByIdQuery request, CancellationToken cancellationToken)
         {
             var stockFromTable = _stocksRepository.GetStockById(request.Id);
+            if (stockFromTable != null)
+            {
+                var locations = await _placementService.GetReservedLocations();
+                stockFromTable.Location = locations.TryGetValue(stockFromTable.LicensePlate, out var location) ? location : null;
+            }
             return new GetStockByIdQueryResponse()
             {
                 Stock = stockFromTable
@@ -35,7 +43,15 @@ namespace InventoryService.Application.Queries.StockQueris
 
         public async Task<GetAllStocksQueryResponse> Handle(GetAllStocksQuery request, CancellationToken cancellationToken)
         {
-            var stocks = _stocksRepository.GetAllStocks();
+            var stocks = _stocksRepository.GetAllStocks().ToList();
+            if (stocks.Count > 0)
+            {
+                var locations = await _placementService.GetReservedLocations();
+                foreach (var stock in stocks)
+                {
+                    stock.Location = locations.TryGetValue(stock.LicensePlate, out var location) ? location : null;
+                }
+            }
 
             return new GetAllStocksQueryResponse()
             {
