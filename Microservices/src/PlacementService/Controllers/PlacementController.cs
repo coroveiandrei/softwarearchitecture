@@ -23,6 +23,12 @@ public class PlacementController : ControllerBase
         _failureSimulator = failureSimulator;
     }
 
+    [HttpGet("GetReservedLocations")]
+    public Task<Dictionary<string, string>> GetReservedLocations()
+    {
+        return _placementRepository.GetReservedLocations();
+    }
+
     [HttpGet("GetEligibleLocations")]
     public async Task<string[]> GetEligibleLocations([FromQuery] int? take)
     {
@@ -36,7 +42,7 @@ public class PlacementController : ControllerBase
         try
         {
             _logger.LogInformation("Reservation attempt received | Stock={ObjectId} Location={Location}", placementReservation.ObjectId, placementReservation.Location);
-            if (_failureSimulator.ShouldFail())
+            if (_failureSimulator.ShouldFail(placementReservation.ObjectId))
             {
                 _logger.LogWarning(
                     "Reservation rejected with HTTP 503 by failure simulator | Location={Location} Stock={ObjectId}",

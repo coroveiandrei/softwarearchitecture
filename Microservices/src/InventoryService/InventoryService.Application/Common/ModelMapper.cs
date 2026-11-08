@@ -16,7 +16,6 @@ namespace InventoryService.Application.Common
             {
                 LicensePlate = request.LicensePlate,
                 Item = request.Item,
-                Location = request.Location,
                 QuantityOnHand = request.QuantityOnHand,
                 Status = request.Status,
                 Lot = request.Lot,
@@ -31,7 +30,6 @@ namespace InventoryService.Application.Common
             {
                 LicensePlate = request.LicensePlate,
                 Item = request.Item,
-                Location = request.Location,
                 QuantityOnHand = request.QuantityOnHand,
                 Status = request.Status,
                 Lot = request.Lot,

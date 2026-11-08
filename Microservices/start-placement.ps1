@@ -1,5 +1,5 @@
 $ErrorActionPreference = "Stop"
-Push-Location (Join-Path $PSScriptRoot "Microservices/src/PlacementService")
+Push-Location (Join-Path $PSScriptRoot "src/PlacementService")
 try {
     dapr run `
         --app-id stockplacementservice `

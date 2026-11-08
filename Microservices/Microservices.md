@@ -19,7 +19,7 @@ dapr --version
 
 ### Start the applications
 
-1. Clone the repository and navigate to the repository root. Run the startup commands below from that folder.
+1. Clone the repository and navigate to the `Microservices` folder. Run the startup commands below from that folder.
 2. Make sure Docker Desktop is running.
 3. Start SQL Server, Azurite, and RabbitMQ:
 
@@ -67,7 +67,7 @@ The sample contains three distinct communication steps:
 
 1. Trace how Inventory Service invokes Placement Service. Identify the application interface, its infrastructure implementation, and the Dapr sidecar call.
 2. Inspect `src/dapr/components/resiliency.yaml`. Which target and HTTP status codes activate the service-invocation retry policy?
-3. Stop Placement Service and restart it with two deterministic failures configured:
+3. Stop Placement Service and restart it with two deterministic failures per stock configured:
 
    ```powershell
    $env:PLACEMENT_FAILURE_COUNT=2
@@ -120,8 +120,13 @@ Prepare a design that keeps the workflow correct under publish failures, timeout
 Focus on:
 
 - what changes in `StockCommandHandler`, `PlacementController`, `PlacementRepository`, and `ToDoEventsController`;
-- whether you would introduce an outbox, compensation, or a different service boundary;
-- where idempotency is enforced;
+- how a transactional outbox would ensure that saved reservations are eventually published;
+- how a saga would coordinate the workflow and compensate a reservation when the workflow cannot complete;
 - what the caller should observe while the workflow is incomplete.
 
 Be ready to explain the trade-offs in your design rather than only naming infrastructure services.
+
+Reference patterns for Challenge #3.
+
+- [Transactional outbox](https://microservices.io/patterns/data/transactional-outbox.html) explains how to save a business change and an outgoing event atomically, then publish through a message relay.
+- [Saga](https://microservices.io/patterns/data/saga.html) explains how to coordinate local transactions across services and compensate completed steps after a business failure.

@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PlacementService\PlacementService.csproj" />
+    <ProjectReference Include="..\InventoryService\InventoryService.Infrastructure\InventoryService.Infrastructure.csproj" />
     <ProjectReference Include="..\TaskManagement\TaskManagement.WebUI\TaskManagement.WebUI.csproj" />
   </ItemGroup>
 

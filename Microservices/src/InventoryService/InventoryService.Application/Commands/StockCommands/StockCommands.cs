@@ -7,7 +7,6 @@ namespace InventoryService.Application.Commands.StockCommands
     {
         public string LicensePlate { get; set; }
         public string Item { get; set; }
-        public string Location { get; set; }
         public int QuantityOnHand { get; set; }
         public string Status { get; set; }
         public string Lot { get; set; }
@@ -27,7 +26,6 @@ namespace InventoryService.Application.Commands.StockCommands
         public Guid Id { get; set; }
         public string LicensePlate { get; set; }
         public string Item { get; set; }
-        public string Location { get; set; }
         public int QuantityOnHand { get; set; }
         public string Status { get; set; }
         public string Lot { get; set; }

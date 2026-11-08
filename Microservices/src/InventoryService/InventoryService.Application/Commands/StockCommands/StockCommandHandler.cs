@@ -70,6 +70,7 @@ namespace InventoryService.Application.Commands.StockCommands
             stockAggregate.ReconstituteFromEvents(baseEvents);
 
             var model = ModelMapper.ConvertCommandToModel(request);
+            model.Location = stockAggregate.Location;
             var stockUpdatedEvent = stockAggregate.Update(model);
 
             await _eventRepository.SaveEvent(stockUpdatedEvent);
