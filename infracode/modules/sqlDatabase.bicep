@@ -6,6 +6,7 @@ param servername string
 param databaseName string
 
 param username string
+@secure()
 param password string
 
 @allowed(['Enabled','Disabled'])

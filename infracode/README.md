@@ -21,3 +21,26 @@ Now create the actual resources
 
 az deployment group create  --resource-group  rg_arc_[yournameinitials] --template-file 1storage.bicep --parameters .\config\storageparams.json
 
+
+## SQL administrator password
+
+The SQL exercise accepts the password through the secure `sqlAdministratorPassword` parameter.
+Create `config/sql-password.local.json` with the following content and replace the placeholder locally.
+
+```json
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sqlAdministratorPassword": { "value": "REPLACE_LOCALLY" }
+  }
+}
+```
+
+Git ignores this local file. Set the resource names in `config/sqlserverparams.json`, then preview the deployment.
+
+```powershell
+az deployment group what-if --resource-group <your-resource-group> --template-file 4sqlserver.bicep --parameters ./config/sqlserverparams.json ./config/sql-password.local.json
+```
+
+After reviewing the preview, replace `what-if` with `create` to deploy.

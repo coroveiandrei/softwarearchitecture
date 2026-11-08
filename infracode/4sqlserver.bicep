@@ -2,6 +2,9 @@ param location string = resourceGroup().location
 
 param sqlServers array 
 
+@secure()
+param sqlAdministratorPassword string
+
 param resourceTags object = {
   DeploymentType: 'Bicep'
 }
@@ -16,6 +19,6 @@ module databaseServerModule 'modules/sqlDatabase.bicep' = [ for sqlServerInstanc
     databaseServerName: sqlServerInstance.name
     databaseName:  sqlServerInstance.database
     username: sqlServerInstance.username
-    password: sqlServerInstance.password
+    password: sqlAdministratorPassword
   }
 }]

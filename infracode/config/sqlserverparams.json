@@ -2,17 +2,15 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    
     "sqlServers": {
-      "value": [          
-          {
+      "value": [
+        {
           "name": "[name]sqlserver",
           "database": "[name]sqldb",
           "username": "andrei",
-          "password": "P@ssw0rd98763123",
           "publicNetworkAccess": "Enabled"
-          }
-          ]
         }
+      ]
+    }
   }
 }

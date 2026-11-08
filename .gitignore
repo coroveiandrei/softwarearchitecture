@@ -354,3 +354,5 @@ healthchecksdb
 /infracode/config/DDDInfrastructureparams.json
 /CleanArchitecture/CleanArc/.vs/CleanArc/DesignTimeBuild/.dtbcache.v2
 /CleanArchitecture/CleanArc/.vs
+
+/infracode/config/sql-password.local.json
