@@ -27,7 +27,9 @@ namespace InventoryService.Infrastructure.RemoteServices
 
         public async Task<bool> ReserveLocation(PlacementReservationModel placementModel)
         {
-            var result = await _httpClient.PostAsJsonAsync("ReserveLocation", placementModel);
+            using var content = JsonContent.Create(placementModel);
+            await content.LoadIntoBufferAsync();
+            using var result = await _httpClient.PostAsync("ReserveLocation", content);
             return result.IsSuccessStatusCode;
         }
 

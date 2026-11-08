@@ -19,12 +19,12 @@ dapr --version
 
 ### Start the applications
 
-1. Clone the repository and navigate to the `Microservices` folder.
+1. Clone the repository and navigate to the repository root. Run the startup commands below from that folder.
 2. Make sure Docker Desktop is running.
-3. From `src/Infrastructure`, start SQL Server, Azurite, and RabbitMQ:
+3. Start SQL Server, Azurite, and RabbitMQ:
 
    ```powershell
-   ./start-all.ps1
+   ./start-microservices-infrastructure.ps1
    ```
 
    The scripts reuse an existing workshop container when one is already present.
@@ -32,8 +32,7 @@ dapr --version
 4. In a new PowerShell window, start Task Management:
 
    ```powershell
-   cd src/TaskManagement/TaskManagement.WebUI
-   ./start-selfhosted.ps1
+   ./start-taskmanagement.ps1
    ```
 
    The application listens on `http://localhost:7000`.
@@ -41,8 +40,7 @@ dapr --version
 5. In another PowerShell window, start Placement Service:
 
    ```powershell
-   cd src/PlacementService
-   ./start-selfhosted.ps1
+   ./start-placement.ps1
    ```
 
    The application listens on `http://localhost:6000`.
@@ -50,8 +48,7 @@ dapr --version
 6. In another PowerShell window, start Inventory Service:
 
    ```powershell
-   cd src/InventoryService/InventoryService.WebUI
-   ./start-selfhosted.ps1
+   ./start-inventory.ps1
    ```
 
    The application listens on `http://localhost:4000`.
@@ -74,7 +71,7 @@ The sample contains three distinct communication steps:
 
    ```powershell
    $env:PLACEMENT_FAILURE_COUNT=2
-   ./start-selfhosted.ps1
+   ./start-placement.ps1
    ```
 
 4. Create a stock item. Use the Placement Service logs to determine how many calls were made before the reservation succeeded.
@@ -96,7 +93,7 @@ Remove-Item Env:PLACEMENT_FAILURE_COUNT
 
    ```powershell
    $env:PLACEMENT_EVENT_FAILURE_COUNT=2
-   ./start-selfhosted.ps1
+   ./start-taskmanagement.ps1
    ```
 
 3. Create a stock item and use the event ID in the logs to verify that the same event is delivered again.
