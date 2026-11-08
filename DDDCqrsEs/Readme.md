@@ -29,13 +29,21 @@
 6. Open the `DDDCqrsEs` solution and run `dotnet build`.
 7. In the current terminal:
    - Make sure you are in the `DDDCqrsEs.WebUI` folder.
-   - Run `dotnet run`.
-8. Navigate to `https://localhost:[port]/swagger`.
+   - Start the API in Development on a port separate from the Microservices sample:
 
-Login with:
+   ```powershell
+   $env:ASPNETCORE_ENVIRONMENT = "Development"
+   dotnet run --no-launch-profile --urls http://localhost:5187
+   ```
 
-- User: `admin`
-- Password: `P@ssw0rd`
+8. Navigate to `http://localhost:5187/swagger/index.html`. The stock endpoints allow anonymous requests. The documented `admin` account is available only if the database was seeded previously.
+9. Run the starter tests from the solution folder:
+
+   ```powershell
+   dotnet test DDDCqrsEs.Tests
+   ```
+
+   The starter has three passing tests and four skipped Challenge #2 tests. Enable those skipped tests when implementing Challenge #2.
 
 ### Challenge #0: Project structure and dependencies
 
@@ -51,13 +59,13 @@ Inspect the overall sequence diagram and determine why the solution has two entr
 
 ### Challenge #1: Write path
 
-In the first challenge, create the writing path. A new event should be generated and stored in the Event Store in Table Storage whenever there is a web request.
+In the first challenge, create the writing path. Create, update, and delete commands should each generate and persist one new domain event in Azure Table Storage. Read requests retrieve data without creating events.
 
 Some code is already in place. Locate and complete it.
 
 Hint: Create a table called `EventStore` in Table Storage to serve as the persistence mechanism.
 
-The challenge is complete when the events `StockCreated`, `StockUpdated`, and `StockDeleted` are visible in `EventStore`.
+The challenge is complete when `StockCreated`, `StockUpdated`, and `StockDeleted` are visible in `EventStore` for the same aggregate, with increasing versions. Use the aggregate ID returned by Create in subsequent Update and Delete requests. SQL projections start updating after Challenge #2 is completed.
 
 ### Challenge #2: Read path
 
@@ -69,7 +77,14 @@ Next, complete the `DDDCqrsEs.WebJob` subscriber so that the received event is d
 
 Hint: Create a queue named `StockEvents` in the Service Bus namespace.
 
-The challenge is complete when the stock appears in SQL.
+Run the subscriber from `DDDCqrsEs.WebJob` in a separate terminal with the Service Bus and SQL environment variables from setup. Set its queue name to the same queue used by the API publisher:
+
+```powershell
+$env:ConnectionStrings__QueueName = "stockevents"
+dotnet run
+```
+
+The challenge is complete when create, update, and delete events update the SQL projection. Enable the four skipped Challenge #2 publishing/subscriber tests and confirm that they pass.
 
 After it works, consider this failure: Table Storage accepts the event, but Service Bus is temporarily unavailable. The command fails after the write model has already changed, and the read model may never receive the event. What consistency problem does this create, and how could the design guarantee that the event is eventually published without undoing the persisted write?
 
@@ -81,9 +96,10 @@ For example, Alice and Bob may both have version 1 of a stock item and update it
 
 ![image](https://github.com/coroveiandrei/trainingsoftarchforcloud/assets/37452422/4f353a94-3213-4237-b8f1-854eba9da467)
 
-The solution checks this in two places:
+Event version assignment and duplicate-key rejection are already implemented. Complete the concurrency behavior:
 
-1. The command validator checks whether the projection version matches the latest aggregate version.
-2. The Event Store rejects duplicate keys. Using the version as the row key and aggregate ID as the partition key provides the concurrency check.
+1. Compare the version supplied by Update or Delete with the latest persisted aggregate version. SQL projections can lag behind the event stream, so comparing only against the projection cannot guarantee that a command is current.
+2. Retain the Event Store's insert-only behavior. If two commands read the same version concurrently, their new events use the same aggregate ID and version. Only one insert can succeed.
+3. Return "Data was changed by another user" for a stale expected version or a competing insert that loses the race.
 
-Versioning is already in place. Implement the "data was changed by another user" validation.
+Verify this with two requests using the same expected version. One should succeed and the other should receive the conflict response.
