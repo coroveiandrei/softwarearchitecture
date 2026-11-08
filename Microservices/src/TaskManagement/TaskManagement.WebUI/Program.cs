@@ -47,6 +47,7 @@ builder.Services.AddDbContext<ToDoDbContext>(options => options.UseSqlServer(con
 builder.Services.AddLocalization();
 builder.Logging.AddApplicationInsights();
 var app = builder.Build();
+app.Logger.LogInformation("Event delivery failure simulator configured | PLACEMENT_EVENT_FAILURE_COUNT={FailureCount} (0=disabled, -1=always fail)", Environment.GetEnvironmentVariable("PLACEMENT_EVENT_FAILURE_COUNT") ?? "0");
 
 using (var scope = app.Services.CreateScope())
 {

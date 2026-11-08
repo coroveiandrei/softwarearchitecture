@@ -35,28 +35,31 @@ public class PlacementController : ControllerBase
     {
         try
         {
-            _logger.LogInformation($"ReservingLocation {placementReservation.Location} by {placementReservation.ObjectId}");
+            _logger.LogInformation("Reservation attempt received | Stock={ObjectId} Location={Location}", placementReservation.ObjectId, placementReservation.Location);
             if (_failureSimulator.ShouldFail())
             {
                 _logger.LogWarning(
-                    "Simulating a transient failure while reserving {Location} for {ObjectId}",
+                    "Reservation rejected with HTTP 503 by failure simulator | Location={Location} Stock={ObjectId}",
                     placementReservation.Location,
                     placementReservation.ObjectId);
                 return StatusCode(503);
             }
 
             await _placementRepository.SavePlacementPosition(placementReservation.Location, placementReservation.ObjectId);
+            _logger.LogInformation("Reservation saved | Stock={ObjectId} Location={Location}", placementReservation.ObjectId, placementReservation.Location);
+            var placementEvent = new PlacementReservationCreated(Guid.NewGuid(), placementReservation.ObjectId, placementReservation.Location);
             await daprClient.PublishEventAsync(
                 "pubsub",
                 "placementEvents",
-                new PlacementReservationCreated(Guid.NewGuid(), placementReservation.ObjectId, placementReservation.Location));
+                placementEvent);
+            _logger.LogInformation("Placement event published; returning HTTP 200 | Event={EventId} Stock={ObjectId} Location={Location}", placementEvent.EventId, placementEvent.ObjectId, placementEvent.Location);
 
 
             return Ok();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error occurred while processing ENTRY");
+            _logger.LogError(ex, "Placement operation failed with HTTP 500");
             return StatusCode(500);
         }
     }
@@ -74,7 +77,7 @@ public class PlacementController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error occurred while processing ENTRY");
+            _logger.LogError(ex, "Placement operation failed with HTTP 500");
             return StatusCode(500);
         }
     }

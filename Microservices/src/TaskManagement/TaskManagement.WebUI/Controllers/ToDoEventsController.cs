@@ -30,19 +30,20 @@ namespace TaskManagement.WebUI.Controllers
         public async Task<ActionResult> ReceivePlacementEvent([FromBody] PlacementReservationCreated placementCreatedEvent)
         {
             _logger.LogInformation(
-                "Received placement event {EventId} for location {Location}",
+                "Placement event delivery received | Event={EventId} Location={Location}",
                 placementCreatedEvent.EventId,
                 placementCreatedEvent.Location);
 
             if (_failureSimulator.ShouldFail())
             {
                 _logger.LogWarning(
-                    "Simulating a failure while processing placement event {EventId}",
+                    "Event delivery rejected with HTTP 503 by failure simulator; eligible for redelivery | Event={EventId}",
                     placementCreatedEvent.EventId);
                 return StatusCode(503);
             }
 
             await Mediator.Send(placementCreatedEvent);
+            _logger.LogInformation("Placement event processed; returning HTTP 200 | Event={EventId} Stock={ObjectId}", placementCreatedEvent.EventId, placementCreatedEvent.ObjectId);
             return Ok();
         }
 

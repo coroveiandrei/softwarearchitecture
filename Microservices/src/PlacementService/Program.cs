@@ -18,6 +18,7 @@ builder.Services.AddApplicationInsightsTelemetry();
 builder.Logging.AddApplicationInsights();
 
 var app = builder.Build();
+app.Logger.LogInformation("Reservation failure simulator configured | PLACEMENT_FAILURE_COUNT={FailureCount} (0=disabled, -1=always fail)", Environment.GetEnvironmentVariable("PLACEMENT_FAILURE_COUNT") ?? "0");
 
 // configure web-app
 if (app.Environment.IsDevelopment())

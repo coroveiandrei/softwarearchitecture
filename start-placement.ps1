@@ -8,7 +8,7 @@ try {
         --dapr-grpc-port 60000 `
         --config ../dapr/config/config.yaml `
         --resources-path ../dapr/components `
-        --log-level debug `
+        --log-level info `
         dotnet run
 }
 finally {

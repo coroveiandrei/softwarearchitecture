@@ -35,7 +35,7 @@ namespace InventoryService.Application.Commands.StockCommands
 
         public async Task<CreateStockCommandResponse> Handle(CreateStockCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation($"Creating Stock {request.LicensePlate}");
+            _logger.LogInformation("Creating stock | Stock={LicensePlate}", request.LicensePlate);
 
             var guid = Guid.NewGuid();
             var stockAggregate = new Stock(guid);
@@ -46,16 +46,16 @@ namespace InventoryService.Application.Commands.StockCommands
             await _eventRepository.SaveEvent(stockCreatedEvent);
             await _eventPublisher.PublishEvent(stockCreatedEvent);
             var locations = await _placementService.GetEligibleLocations(3);
-            _logger.LogInformation($"Called placement service, got {locations.Count()} locations");
+            _logger.LogInformation("Eligible locations received | Stock={LicensePlate} Count={Count}", model.LicensePlate, locations.Count());
             if (locations.Any())
             {
                 var firstLocation = locations.First();
-                _logger.LogInformation($"Reserving {firstLocation} ");
+                _logger.LogInformation("Requesting reservation through Dapr | Stock={LicensePlate} Location={Location}", model.LicensePlate, firstLocation);
                 var result = await _placementService.ReserveLocation(new PlacementReservationModel(firstLocation, model.LicensePlate));
                 if(result)
-                    _logger.LogInformation($"Reservation Done for {firstLocation} ");
+                    _logger.LogInformation("Reservation succeeded | Stock={LicensePlate} Location={Location}", model.LicensePlate, firstLocation);
                 else
-                    _logger.LogInformation($"Reservation Failed for {firstLocation} ");
+                    _logger.LogWarning("Reservation failed after Dapr returned its final response | Stock={LicensePlate} Location={Location}", model.LicensePlate, firstLocation);
             }
 
             return new CreateStockCommandResponse { AggregateId = guid, Version = stockCreatedEvent.Version };
