@@ -18,6 +18,7 @@ using TaskManagement.Domain.Entities.Authentication;
 using TaskManagement.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using TaskManagement.WebUI.FailureSimulation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +30,7 @@ builder.Services.AddDaprClient(builder => builder
     .UseGrpcEndpoint($"http://localhost:{daprGrpcPort}"));
 
 builder.Services.AddControllers();
+builder.Services.AddSingleton(_ => PlacementEventFailureSimulator.FromEnvironment());
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));
 builder.Services.AddMediatR(c => c.RegisterServicesFromAssemblyContaining<AddToDoCommandValidator>());
 builder.Services.AddValidatorsFromAssembly(typeof(AddToDoCommandValidator).Assembly);
@@ -45,6 +47,12 @@ builder.Services.AddDbContext<ToDoDbContext>(options => options.UseSqlServer(con
 builder.Services.AddLocalization();
 builder.Logging.AddApplicationInsights();
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ToDoDbContext>();
+    dbContext.Database.Migrate();
+}
 
 // configure web-app
 if (app.Environment.IsDevelopment())

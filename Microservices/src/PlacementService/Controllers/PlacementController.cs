@@ -1,6 +1,7 @@
 ﻿using PlacementService.Events;
 using PlacementService.Models;
 using PlacementService.Repositories;
+using PlacementService.FailureSimulation;
 
 namespace PlacementService.Controllers;
 
@@ -10,13 +11,16 @@ public class PlacementController : ControllerBase
 {
     private readonly ILogger<PlacementController> _logger;
     private readonly IPlacemementRepository _placementRepository;
+    private readonly ReservationFailureSimulator _failureSimulator;
 
     public PlacementController(
         ILogger<PlacementController> logger,
-        IPlacemementRepository placementRepository)
+        IPlacemementRepository placementRepository,
+        ReservationFailureSimulator failureSimulator)
     {
         _logger = logger;
         _placementRepository = placementRepository;
+        _failureSimulator = failureSimulator;
     }
 
     [HttpGet("GetEligibleLocations")]
@@ -32,26 +36,20 @@ public class PlacementController : ControllerBase
         try
         {
             _logger.LogInformation($"ReservingLocation {placementReservation.Location} by {placementReservation.ObjectId}");
-            #region Bad Request
-            //return BadRequest();
-            #endregion
-
-            #region Transient Error
-            //if (new Random().NextInt64() % 2 != 0)
-            //{
-            //    _logger.LogInformation($"BadRequest {placementReservation.Location} by {placementReservation.ObjectId}");
-            //    return StatusCode(503);
-            //}
-            #endregion
-
-            #region Long time Failure
-            //_logger.LogInformation($"BadRequest {placementReservation.Location} by {placementReservation.ObjectId}");
-            //return StatusCode(503);
-            #endregion
-
+            if (_failureSimulator.ShouldFail())
+            {
+                _logger.LogWarning(
+                    "Simulating a transient failure while reserving {Location} for {ObjectId}",
+                    placementReservation.Location,
+                    placementReservation.ObjectId);
+                return StatusCode(503);
+            }
 
             await _placementRepository.SavePlacementPosition(placementReservation.Location, placementReservation.ObjectId);
-            await daprClient.PublishEventAsync("pubsub", "placementEvents", new PlacementReservationCreated(placementReservation.ObjectId, placementReservation.Location));
+            await daprClient.PublishEventAsync(
+                "pubsub",
+                "placementEvents",
+                new PlacementReservationCreated(Guid.NewGuid(), placementReservation.ObjectId, placementReservation.Location));
 
 
             return Ok();

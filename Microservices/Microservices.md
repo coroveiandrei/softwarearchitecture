@@ -1,84 +1,130 @@
 # Microservices
 
-### Map & start the solution:
-1. Clone the repo. Navigate to Microservices folder.
-2. Make sure you have DAPR, Docker Desktop, and .NET 8 SDK installed
-DAPR Cli - https://docs.dapr.io/getting-started/install-dapr-cli/
-Docker Desktop - https://www.docker.com/products/docker-desktop/
-4. Make sure Docker Desktop is started
-5. Start the infrastructure containers (localdb, azurite, rabbit). Go to /src/infrastructure and run **start-all.ps1**. This will spin up 3 docker containers:
-- localdb - used for storage in TaskManagement and InventoryService
-- azureite - used as table storage in InventoryService
-- rabbit - used as broker for messaging mechanism
+## Map and start the solution
 
-5. Start TaskManagement Project. 
+### Prerequisites
 
-Navigate to TaskManagement\TaskManagement.WebUI and run start-selfhosted.ps1. If all goes well, you should see:
+- .NET 8 SDK
+- Docker Desktop
+- [Dapr CLI](https://docs.dapr.io/getting-started/install-dapr-cli/)
 
-```
-== APP == info: Microsoft.Hosting.Lifetime[14]
-== APP == Now listening on: http://localhost:7000
-== APP == info: Microsoft.Hosting.Lifetime[0]
-== APP == Application started. Press Ctrl+C to shut down.
+After installing the CLI, initialize the local Dapr runtime once:
+
+```powershell
+dapr init
+dapr --version
 ```
 
-Notice that it is a copy of the exercise we did for CleanArchitecture; it does not contain authentication.
+`dapr init` starts the Redis state store and Zipkin tracing containers used by this sample.
 
-6. Start PlacementService Project. 
-Open another Powershell window. Navigate to PlacementService and run start-selfhosted.ps1. If all goes well, you should see:
+### Start the applications
 
+1. Clone the repository and navigate to the `Microservices` folder.
+2. Make sure Docker Desktop is running.
+3. From `src/Infrastructure`, start SQL Server, Azurite, and RabbitMQ:
+
+   ```powershell
+   ./start-all.ps1
+   ```
+
+   The scripts reuse an existing workshop container when one is already present.
+
+4. In a new PowerShell window, start Task Management:
+
+   ```powershell
+   cd src/TaskManagement/TaskManagement.WebUI
+   ./start-selfhosted.ps1
+   ```
+
+   The application listens on `http://localhost:7000`.
+
+5. In another PowerShell window, start Placement Service:
+
+   ```powershell
+   cd src/PlacementService
+   ./start-selfhosted.ps1
+   ```
+
+   The application listens on `http://localhost:6000`.
+
+6. In another PowerShell window, start Inventory Service:
+
+   ```powershell
+   cd src/InventoryService/InventoryService.WebUI
+   ./start-selfhosted.ps1
+   ```
+
+   The application listens on `http://localhost:4000`.
+
+7. Open `http://localhost:4000` and create a stock item. The item should receive a location, and Task Management should log the placement task.
+
+The sample contains three distinct communication steps:
+
+1. Inventory Service invokes Placement Service synchronously.
+2. Placement Service stores the reservation using Dapr state management.
+3. Placement Service publishes an event that Task Management receives asynchronously.
+
+## Challenge #1 — Service invocation and retries
+
+![Service invocation](https://github.com/user-attachments/assets/59c968dc-500f-4f5c-8825-328e6cca7e7d)
+
+1. Trace how Inventory Service invokes Placement Service. Identify the application interface, its infrastructure implementation, and the Dapr sidecar call.
+2. Inspect `src/dapr/components/resiliency.yaml`. Which target and HTTP status codes activate the service-invocation retry policy?
+3. Stop Placement Service and restart it with two deterministic failures configured:
+
+   ```powershell
+   $env:PLACEMENT_FAILURE_COUNT=2
+   ./start-selfhosted.ps1
+   ```
+
+4. Create a stock item. Use the Placement Service logs to determine how many calls were made before the reservation succeeded.
+5. Restart Placement Service with `$env:PLACEMENT_FAILURE_COUNT=-1`, which makes every reservation attempt fail. How many total attempts occur, including the original request?
+6. Explain why retrying `ReserveLocation` is safe or unsafe. What would have to change if the service failed after saving the reservation but before returning the response?
+
+Remove the environment variable when finished:
+
+```powershell
+Remove-Item Env:PLACEMENT_FAILURE_COUNT
 ```
-== APP == info: Microsoft.Hosting.Lifetime[14]
-== APP ==       Now listening on: http://localhost:6000
-== APP == info: Microsoft.Hosting.Lifetime[0]
-== APP ==       Application started. Press Ctrl+C to shut down.
+
+## Challenge #2 — Pub/sub, redelivery, and idempotency
+
+![Pub/sub](https://github.com/user-attachments/assets/be798813-4fe6-450c-a4c0-4b42bef0da5c)
+
+1. Trace how Placement Service publishes `PlacementReservationCreated` and how Task Management subscribes to it.
+2. Restart Task Management with two deterministic failures configured:
+
+   ```powershell
+   $env:PLACEMENT_EVENT_FAILURE_COUNT=2
+   ./start-selfhosted.ps1
+   ```
+
+3. Create a stock item and use the event ID in the logs to verify that the same event is delivered again.
+4. Restart Task Management with `$env:PLACEMENT_EVENT_FAILURE_COUNT=-1`. Follow the message through the configured retries until `ReceivePlacementDeadLetter` logs it. Use the RabbitMQ management UI at `http://localhost:15672` (`guest` / `guest`) to inspect the exchanges and queues involved.
+5. Dapr pub/sub provides at-least-once delivery. Identify what would happen if the handler completed its business operation but failed before acknowledging the message.
+6. Propose how Task Management could use `EventId` to make the handler idempotent. Which component should store the processed event IDs?
+
+Remove the environment variable when finished:
+
+```powershell
+Remove-Item Env:PLACEMENT_EVENT_FAILURE_COUNT
 ```
 
-7. Start InventoryService Project
-Open another Powershell window. Navigate to InventoryService\InventoryService.WebUI and run start-selfhosted.ps1. If all goes well, you should see:
+## Challenge #3 — Consistency across services
 
-```
-== APP == info: Microsoft.Hosting.Lifetime[14]
-== APP ==       Now listening on: http://localhost:4000
-== APP == info: Microsoft.Hosting.Lifetime[0]
-== APP ==       Application started. Press Ctrl+C to shut down.
-```
+Work in groups. You have **20 minutes to prepare** and **5 minutes to present**.
 
-8. Test:
+Consider this failure:
 
-Open up http://localhost:4000 and create a stock. You should see that a location is received for the stock and also that in TaskManagement console a task has been made.
+> Placement Service saves a location reservation, but publishing `PlacementReservationCreated` fails. The location is occupied while Task Management never receives the work item.
 
-### Challenge #1 - Inspect Service Invocation - Sync Communication
-![image](https://github.com/user-attachments/assets/59c968dc-500f-4f5c-8825-328e6cca7e7d)
+Prepare a design that keeps the workflow correct under publish failures, timeouts, and duplicate messages.
 
-1. Inspect how InventoryService calls PlacementService
-2. Simulate a transient failure by uncommenting the region TransientIssue in PlacementService. Is the call processing retried? 
-3. Simulate a long-term failure by uncommenting the region related to LongTimeFailure in PlacementService. How many retries are made before the service abandons the call?
+Focus on:
 
-### Challenge #2 - DAPR Pub/Sub - AsyncCommunication
-![image](https://github.com/user-attachments/assets/be798813-4fe6-450c-a4c0-4b42bef0da5c)
+- what changes in `StockCommandHandler`, `PlacementController`, `PlacementRepository`, and `ToDoEventsController`;
+- whether you would introduce an outbox, compensation, or a different service boundary;
+- where idempotency is enforced;
+- what the caller should observe while the workflow is incomplete.
 
-1. Inspect how PlacementService calls TaskManagement
-2. Simulate a transient failure by uncommenting the region TransientIssue in TaskManagement. Is the message reprocessed? 
-3. Simulate a long-term failure by uncommenting the region related to LongTimeFailure in TaskManagement. How many retries are made before the message is abandoned?
-
-### Challenge #3.a - Deployment strategy
-
-You are tasked with sketching a deployment strategy for the system above.
-1. What services would you use for hosting? Why?
-2. What pipeline technology would you use? How would you configure that? Why?
-3. Other things that you consider important
-
-
-### Challenge #3.b - Testing strategy
-
- You are tasked with sketching a testing strategy for the system above. 
- Use this questions to get you started:
- 1. What kind of testing would you use? What use cases do you think you will cover with each of the testig strategies?
- 2. Think about security testing
- 3. Think about performance testing. How would you conduct this?
- 4. Other things that you consider important
-
-  
- 
- 
+Be ready to explain the trade-offs in your design rather than only naming infrastructure services.
