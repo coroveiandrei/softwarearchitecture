@@ -17,6 +17,16 @@ dapr --version
 
 `dapr init` starts the Redis state store and Zipkin tracing containers used by this sample.
 
+### Enable PowerShell scripts on Windows
+
+Before running the workshop scripts, run this command in **each PowerShell window** you use, including the new windows opened below:
+
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+```
+
+If prompted, enter `Y` to confirm. This setting applies only to the current PowerShell session, ends when the window closes, and does not require administrator privileges.
+
 ### Start the applications
 
 1. Clone the repository and navigate to the `Microservices` folder. Run the startup commands below from that folder.
