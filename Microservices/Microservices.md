@@ -121,18 +121,15 @@ Remove-Item Env:PLACEMENT_EVENT_FAILURE_COUNT
 
 Work in groups. You have **20 minutes to prepare** and **5 minutes to present**.
 
-Design a testing strategy for Inventory Service, Placement Service, and Task Management. Use the stock creation workflow from the previous exercises as your starting point.
+Sketch a testing strategy for the three services in this sample. Use these questions to get started:
 
-Use these questions to guide your design:
+1. What types of tests would you use? Give one example of what you would test with each type.
+2. How would you test that the services work together? What happens when one service is unavailable?
+3. What security checks would you include?
+4. How would you test performance when many users use the system at the same time?
+5. Which tests should pass before releasing a new version?
 
-1. Which test types would you use: unit, integration, contract, and end-to-end tests? Give a concrete use case for each, explain what it verifies, and decide which dependencies should be real or replaced with test doubles.
-2. How would you verify the synchronous API contract between Inventory Service and Placement Service, and the event contract between Placement Service and Task Management? How would you detect a breaking change before deploying a service independently?
-3. How would you test timeouts, retries, duplicate messages, and dead-letter handling? Define the expected business outcome and how you would assert it when processing is asynchronous.
-4. What security tests would you include? Identify the risks and checks needed before exposing this sample as a production service, including authentication, authorization, input validation, and secrets handling.
-5. How would you conduct performance testing? Define a workload, the environment and data required, and measurable acceptance criteria for response time, throughput, error rate, and message-processing delay.
-6. Which tests should run on every pull request, before deployment, and after deployment? What results should block a release, and how would you keep the tests reliable and fast enough to use?
-
-Present a test matrix with the test type, scenario, dependencies, expected result, and pipeline stage. Explain your priorities and trade-offs, including what you would leave out of the first version and why.
+Present your choices and briefly explain why.
 
 ## Challenge #4 — Consistency across services
 
