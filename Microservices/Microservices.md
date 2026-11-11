@@ -117,7 +117,24 @@ Remove the environment variable when finished:
 Remove-Item Env:PLACEMENT_EVENT_FAILURE_COUNT
 ```
 
-## Challenge #3 — Consistency across services
+## Challenge #3 — Testing strategy
+
+Work in groups. You have **20 minutes to prepare** and **5 minutes to present**.
+
+Design a testing strategy for Inventory Service, Placement Service, and Task Management. Use the stock creation workflow from the previous exercises as your starting point.
+
+Use these questions to guide your design:
+
+1. Which test types would you use: unit, integration, contract, and end-to-end tests? Give a concrete use case for each, explain what it verifies, and decide which dependencies should be real or replaced with test doubles.
+2. How would you verify the synchronous API contract between Inventory Service and Placement Service, and the event contract between Placement Service and Task Management? How would you detect a breaking change before deploying a service independently?
+3. How would you test timeouts, retries, duplicate messages, and dead-letter handling? Define the expected business outcome and how you would assert it when processing is asynchronous.
+4. What security tests would you include? Identify the risks and checks needed before exposing this sample as a production service, including authentication, authorization, input validation, and secrets handling.
+5. How would you conduct performance testing? Define a workload, the environment and data required, and measurable acceptance criteria for response time, throughput, error rate, and message-processing delay.
+6. Which tests should run on every pull request, before deployment, and after deployment? What results should block a release, and how would you keep the tests reliable and fast enough to use?
+
+Present a test matrix with the test type, scenario, dependencies, expected result, and pipeline stage. Explain your priorities and trade-offs, including what you would leave out of the first version and why.
+
+## Challenge #4 — Consistency across services
 
 Work in groups. You have **20 minutes to prepare** and **5 minutes to present**.
 
@@ -136,7 +153,7 @@ Focus on:
 
 Be ready to explain the trade-offs in your design rather than only naming infrastructure services.
 
-Reference patterns for Challenge #3.
+Reference patterns for Challenge #4.
 
 - [Transactional outbox](https://microservices.io/patterns/data/transactional-outbox.html) explains how to save a business change and an outgoing event atomically, then publish through a message relay.
 - [Saga](https://microservices.io/patterns/data/saga.html) explains how to coordinate local transactions across services and compensate completed steps after a business failure.
