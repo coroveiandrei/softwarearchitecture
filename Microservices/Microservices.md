@@ -63,7 +63,7 @@ If prompted, enter `Y` to confirm. This setting applies only to the current Powe
 
    The application listens on `http://localhost:4000`.
 
-7. Open `http://localhost:4000` and create a stock item. The item should receive a location, and Task Management should log the placement task.
+7. Open Swagger UI at [http://localhost:4000/swagger/index.html](http://localhost:4000/swagger/index.html) and create a stock item. The item should receive a location, and Task Management should log the placement task.
 
 The sample contains three distinct communication steps:
 
